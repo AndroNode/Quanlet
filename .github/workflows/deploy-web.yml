@@ -2,9 +2,8 @@ name: Deploy website
 
 # Builds the site and deploys the Worker (static site + /api) to Cloudflare.
 # Needs repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+# Manual only: production is deployed on the owner's explicit go-ahead, never on every push.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -38,12 +38,16 @@ jobs:
           node-version: 20
           cache: pnpm
       # Tests sign with real ML-DSA-44 keys through node (@noble/post-quantum) and python3.
-      - run: pnpm install --frozen-lockfile --filter @quanlet/contracts
+      # The toolkit (cli/) is in the tests too: they compare its encoders with the contracts.
+      - run: pnpm install --frozen-lockfile --filter @quanlet/contracts --filter @quanlet/cli
         working-directory: .
       - uses: foundry-rs/foundry-toolchain@v1
         with:
           version: v1.7.1
-      - run: forge build --sizes
+      # Robinhood Chain allows contracts up to 98,304 bytes, so forge's EIP-170 (24,576-byte) size check does not
+      # apply: build, then check every deployed contract against the chain's own limit.
+      - run: forge build
+      - run: node -e 'const fs=require("fs");let bad=0;for(const n of ["PersonalVaultV2","VaultFactoryV2","KeyFactoryV2","MLDSA44Verifier","PersonalVault","VaultFactory","KeyFactory"]){const b=(require(`./out/${n}.sol/${n}.json`).deployedBytecode.object.length-2)/2;console.log(n,b);if(b>98304)bad++}process.exit(bad)'
       - run: forge test -vv
         env:
           FOUNDRY_PROFILE: ci

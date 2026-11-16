@@ -35,7 +35,7 @@ Everything deploys from GitHub Actions.
 
 ### Website (Cloudflare Workers)
 
-`deploy-web.yml` runs on every push to `main`. Add two repository secrets:
+`deploy-web.yml` runs only when started by hand (Actions tab, "Deploy website", Run workflow). Add two repository secrets:
 
 - `CLOUDFLARE_API_TOKEN`: a token with the "Edit Cloudflare Workers" template permissions.
 - `CLOUDFLARE_ACCOUNT_ID`
