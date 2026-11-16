@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: Website, API and models
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r --filter '!@quanlet/contracts' typecheck
+      - run: pnpm -r --filter '!@quanlet/contracts' test
+      - run: pnpm --filter @quanlet/web build
+
+  contracts:
+    name: Contracts (Foundry)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      # Tests sign with real ML-DSA-44 keys through node (@noble/post-quantum) and python3.
+      - run: pnpm install --frozen-lockfile --filter @quanlet/contracts
+        working-directory: .
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.7.1
+      - run: forge build --sizes
+      - run: forge test -vv
+        env:
+          FOUNDRY_PROFILE: ci

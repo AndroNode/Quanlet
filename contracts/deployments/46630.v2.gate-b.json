@@ -1,0 +1,11 @@
+{
+  "chainId": 46630,
+  "fastOverAllowanceRefused": true,
+  "fastTransferWei": 100000000000000,
+  "fundedWei": 400000000000000,
+  "policyHash": "0x6e0bdde1340d78a3d1312f71b934f068bd5e0e1590fb28809c5e1d67729920a0",
+  "primaryOnlyProtectedRefused": true,
+  "protectedTransferWei": 100000000000000,
+  "vault": "0xDf9bF0A5d817685aAD1644a82C50B981A65c7bDA",
+  "vaultBalanceAfterWei": 200000000000000
+}

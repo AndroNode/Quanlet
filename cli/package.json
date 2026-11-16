@@ -1,0 +1,26 @@
+{
+  "name": "@quanlet/cli",
+  "version": "0.2.0",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "description": "Standalone Quanlet toolkit for protocol 1.x and 2.0 vaults: keys, inspection, offline signing and transaction assembly without any Quanlet server.",
+  "type": "module",
+  "bin": {
+    "quanlet": "./bin/quanlet.mjs"
+  },
+  "scripts": {
+    "build": "true",
+    "typecheck": "true",
+    "test": "node test/run.mjs",
+    "sync": "node scripts/sync.mjs"
+  },
+  "dependencies": {
+    "@noble/ciphers": "2.0.1",
+    "@noble/hashes": "2.0.1",
+    "@noble/post-quantum": "0.5.4",
+    "viem": "2.38.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

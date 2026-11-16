@@ -1,0 +1,380 @@
+{
+  "format": "quanlet-release-manifest",
+  "version": 1,
+  "chain": {
+    "chainId": 46630,
+    "name": "Robinhood Chain testnet",
+    "deployedAtBlock": 149396449
+  },
+  "release": {
+    "date": "2026-11-06",
+    "stage": "testnet, not for real funds"
+  },
+  "source": {
+    "commit": "f7c7a1e9f6c49aa636d2e570279b59b38b0eb2ae",
+    "contractsDirty": false,
+    "files": {
+      "contracts/src/KeyFactory.sol": "0x29944f377d8b5bd761515de40f6a5e1c535cafc9f90c2da1c4e62b775eec541b",
+      "contracts/src/KeyPrep.sol": "0xf0f7e6ae332ae0a556be6f616f2198959e28e0d719130253374c01d18b774224",
+      "contracts/src/PersonalVault.sol": "0xbc17dfd4a2afd2e4bfd4c24fa3a4d4af317d7d48ed64255fa9376c67314be252",
+      "contracts/src/QuanletConstants.sol": "0x092a655f91d02d3825b9bd82c1b748cca1b0a3d41671dda177bb8d9f046980f4",
+      "contracts/src/VaultFactory.sol": "0xd36dfb320e4106a6e2a8b0c11e000c8fe5a373b93df91536b208f338f7d47edd",
+      "contracts/src/verifier/Decode.sol": "0x62800c6dc97625581add1aaae8650f344fd1f165f7ac53d2632dc5c995758a9f",
+      "contracts/src/verifier/FastKeccak170.sol": "0xa0b8b0c01542264b192b3697f5e2d078dd173506b89fd824df32707e6ee2c3cd",
+      "contracts/src/verifier/IMLDSAVerifier.sol": "0xde2461a26d1ed4306a6888e998d06c725960f6556a945516e9d93f7564fcf379",
+      "contracts/src/verifier/InvNtt.sol": "0xb097bdd5a4881559abe91303239b3f12e1a2a74be48894b7134efc48be0a125c",
+      "contracts/src/verifier/MLDSA44Verifier.sol": "0xe73fbc14792d8a48869476e54ad58cae2b78dab0930a9f0bda0aa1363db7176e",
+      "contracts/src/verifier/Ntt.sol": "0x87b2d1b4d88312b40694163c0656e5435d06221a18625cce65dbcf1f9674795f"
+    }
+  },
+  "compiler": {
+    "solc": "0.8.30+commit.73712a01",
+    "evmVersion": "cancun",
+    "optimizer": true,
+    "optimizerRuns": 10000,
+    "viaIR": true,
+    "bytecodeHash": "none",
+    "cborMetadata": false,
+    "configFile": {
+      "path": "contracts/foundry.toml",
+      "sha256": "0x0ec04aac714bd764782a9b2625a894f6a84ac95efe89f96b2817ca33ed636ef2"
+    }
+  },
+  "verifier": {
+    "implementation": "ML-DSA-44 (FIPS 204 Algorithm 3, non-prehashed, empty context) in pure EVM",
+    "provenance": "Fireblocks Labs ML-DSA-44 EVM verifier, MIT licence, vendored under contracts/src/verifier; unaudited research code upstream",
+    "licence": {
+      "path": "contracts/src/verifier/LICENSE-fireblocks",
+      "sha256": "0x819c7c05673a72f38824225d46ac36068272a416874f9f8af62d3dd54ac672fe"
+    },
+    "files": {
+      "contracts/src/verifier/Decode.sol": "0x62800c6dc97625581add1aaae8650f344fd1f165f7ac53d2632dc5c995758a9f",
+      "contracts/src/verifier/FastKeccak170.sol": "0xa0b8b0c01542264b192b3697f5e2d078dd173506b89fd824df32707e6ee2c3cd",
+      "contracts/src/verifier/IMLDSAVerifier.sol": "0xde2461a26d1ed4306a6888e998d06c725960f6556a945516e9d93f7564fcf379",
+      "contracts/src/verifier/InvNtt.sol": "0xb097bdd5a4881559abe91303239b3f12e1a2a74be48894b7134efc48be0a125c",
+      "contracts/src/verifier/LICENSE-fireblocks": "0x819c7c05673a72f38824225d46ac36068272a416874f9f8af62d3dd54ac672fe",
+      "contracts/src/verifier/MLDSA44Verifier.sol": "0xe73fbc14792d8a48869476e54ad58cae2b78dab0930a9f0bda0aa1363db7176e",
+      "contracts/src/verifier/Ntt.sol": "0x87b2d1b4d88312b40694163c0656e5435d06221a18625cce65dbcf1f9674795f"
+    },
+    "keccakHelper": {
+      "path": "contracts/helpers/f1600_170.hex",
+      "codehash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b"
+    },
+    "conformance": {
+      "suite": "NIST ACVP ML-DSA sigVer (FIPS 204), ML-DSA-44 cases",
+      "source": "https://github.com/usnistgov/ACVP-Server/tree/master/gen-val/json-files/ML-DSA-sigVer-FIPS204 (internalProjection.json)",
+      "sourceSha256": "47cdd6314c7f746d02421ffcba89d4dbc7bb875ac49e07a029fdfc26fba55437",
+      "vectors": {
+        "path": "contracts/test/acvp/mldsa44-sigver.json",
+        "sha256": "0x1fece8a076168608fdc9c1c302d16439689fd3ee5a291b51eddac59f15951529",
+        "cases": 60,
+        "valid": 12
+      },
+      "harness": {
+        "path": "contracts/test/acvp/MLDSA44VerifierACVP.sol",
+        "sha256": "0xf6b425533d9d01b5faad566dd4f132f3eb49db7ac9d2e6177294b5fdfe37552c"
+      },
+      "test": "contracts/test/Acvp.t.sol (forge test --match-contract AcvpTest)",
+      "result": "All 60 cases give the NIST result (12 accepted, 48 rejected). The production verifier runs tcId 10 directly; the other 59 go through a test-only copy that takes M prime or mu, checked against the production verifier by test_HarnessMatchesProduction."
+    }
+  },
+  "contracts": {
+    "F1600Helper": {
+      "address": "0xEB38AaA050e8ce2d0E56d735c607b9496af9F003",
+      "admin": "none",
+      "upgradeable": false,
+      "local": {
+        "runtimeCodeKeccak": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b",
+        "source": "contracts/helpers/f1600_170.hex"
+      },
+      "liveCodehash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b",
+      "liveMatchesLocalBuild": true
+    },
+    "MLDSA44Verifier": {
+      "address": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c",
+      "admin": "none",
+      "upgradeable": false,
+      "local": {
+        "creationCodeKeccak": "0xe894c3cc27475ca4565f954ecd4d0eb252e0bb5146184b2d49c842f8357c05cd",
+        "runtimeCodeKeccak": null,
+        "runtimeCodeMaskedKeccak": "0x401f0841594780a33084ed22db39651ab77d6cb51a0ec7bc7a3cc106906a07f9",
+        "immutableSlots": 6
+      },
+      "liveCodehash": "0x00221a5ca716f915d6209797adf624ecf15d3e6966427c40f02b9a7047c00865",
+      "liveMatchesLocalBuild": true,
+      "expectedCodehash": "0x00221a5ca716f915d6209797adf624ecf15d3e6966427c40f02b9a7047c00865"
+    },
+    "KeyFactory": {
+      "address": "0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d",
+      "admin": "none",
+      "upgradeable": false,
+      "local": {
+        "creationCodeKeccak": "0x9d6422ad71b86ae5ab66af8b56e177c1eed565002c36135c9c1289b3a2e03fe2",
+        "runtimeCodeKeccak": null,
+        "runtimeCodeMaskedKeccak": "0xb5f600cb58ffcc2f6391d25e74759c712b2b28261380efeba5d745299e5a507c",
+        "immutableSlots": 9
+      },
+      "liveCodehash": "0x2b61be03bb04e3b5116969ead7dd23fa217add76cfe6694c4c2ecb61ecf06725",
+      "liveMatchesLocalBuild": true
+    },
+    "VaultFactory": {
+      "address": "0xE8cB1b0B90142C55068af0f212030f93847049B3",
+      "admin": "none",
+      "upgradeable": false,
+      "local": {
+        "creationCodeKeccak": "0x4026fac96ac4011a25df799e099c76f60c3c267df0a3bcb18633d427ebde05de",
+        "runtimeCodeKeccak": null,
+        "runtimeCodeMaskedKeccak": "0xd6bcf62d4604730d03d1172befaae553f64aea23b8dde434e262914c041ba7cd",
+        "immutableSlots": 5
+      },
+      "liveCodehash": "0xe4b41dd2116d292dce16231fd52c754aac4c6e76f561583c64d366d951f0e651",
+      "liveMatchesLocalBuild": true
+    },
+    "PersonalVault": {
+      "deployedBy": "VaultFactory (CREATE2, one per owner)",
+      "admin": "none: authority is the vault's own ML-DSA-44 primary and recovery keys",
+      "upgradeable": false,
+      "local": {
+        "creationCodeKeccak": "0x6e34c6593fbec89643bad7b6b60bc2d1e426a23ff91a826bf361c0c4576ecaf6",
+        "runtimeCodeKeccak": null,
+        "runtimeCodeMaskedKeccak": "0x0b89b9ec5083b2645f3f3527e4e7aa1bf61a82d5425150c9e0a2c8882544ebb4",
+        "immutableSlots": 6
+      }
+    },
+    "compatibleVaultFactories": [
+      "0x4e00144f85dcA5E49bcFf5386E49d4465fcC5399"
+    ]
+  },
+  "admin": {
+    "summary": "No owner, administrator, proxy, pause or upgrade path in any component. The deployer key has no power after deployment."
+  },
+  "keyPreparation": {
+    "version": 1,
+    "where": "on chain, inside KeyFactory.registerKey, from the raw 1,312-byte public key only",
+    "blob": "0x00 || tr (64) || NTT(2^13 t1) (4 polys) || ExpandA(rho) (16 polys); 32 words per poly, coefficient 8w+s at bit 32s; 20,545 bytes",
+    "recordId": "keccak256(keyId, blobHash), keyId = keccak256(rawPk)",
+    "reference": "contracts/script/prepare.py, cli/lib/prepare.mjs"
+  },
+  "assets": {
+    "native": "ETH",
+    "erc20Reviewed": [],
+    "note": "The vault can hold ERC-20 tokens, but no token contract has been reviewed for this release; only ETH is supported."
+  },
+  "signingVectors": {
+    "path": "cli/vectors/46630.json",
+    "sha256": "0x10c5eca2e0570dfb86b913ce90af909a2248b6db9310990f1dda3d56273a295f",
+    "generator": "quanlet vectors",
+    "note": "Regenerated for the new VaultFactory after deployment; the vectors commit the factory address."
+  },
+  "costs": {
+    "foundry": {
+      "source": "contracts/test/GasReport.t.sol",
+      "sha256": "0x8892591a0be1580dff42cadb829961a155b6038181dfc391eb729bb8e5584fbf",
+      "operations": {
+        "cancelSecurityChange (2 signatures)": {
+          "calldataBytes": 5188,
+          "estimatedTxGas": 2546789,
+          "executionGas": 2447389
+        },
+        "cancelWithdrawal": {
+          "calldataBytes": 2628,
+          "estimatedTxGas": 1287248,
+          "executionGas": 1226408
+        },
+        "createVault": {
+          "calldataBytes": 2724,
+          "estimatedTxGas": 4100003,
+          "executionGas": 4037267
+        },
+        "executeWithdrawal (ETH)": {
+          "calldataBytes": 36,
+          "estimatedTxGas": 60782,
+          "executionGas": 39218
+        },
+        "finalizeSecurityChange (primary)": {
+          "calldataBytes": 4,
+          "estimatedTxGas": 30638,
+          "executionGas": 9574
+        },
+        "finalizeSecurityChange (recovery set)": {
+          "calldataBytes": 4,
+          "estimatedTxGas": 36529,
+          "executionGas": 15465
+        },
+        "invalidatePendingRequests": {
+          "calldataBytes": 2596,
+          "estimatedTxGas": 1305209,
+          "executionGas": 1244881
+        },
+        "registerKey": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12354901,
+          "executionGas": 12273901
+        },
+        "registerKey#1": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12350242,
+          "executionGas": 12269230
+        },
+        "registerKey#2": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12350018,
+          "executionGas": 12268922
+        },
+        "registerKey#3": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12350511,
+          "executionGas": 12269451
+        },
+        "registerKey#4": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12352413,
+          "executionGas": 12271221
+        },
+        "registerKey#5": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12352862,
+          "executionGas": 12271610
+        },
+        "registerKey#6": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12351749,
+          "executionGas": 12270641
+        },
+        "registerKey#7": {
+          "calldataBytes": 3876,
+          "estimatedTxGas": 12349434,
+          "executionGas": 12268494
+        },
+        "scheduleWithdrawal": {
+          "calldataBytes": 2756,
+          "estimatedTxGas": 1405435,
+          "executionGas": 1344395
+        },
+        "scheduleWithdrawal (with relay fee)": {
+          "calldataBytes": 2756,
+          "estimatedTxGas": 1403509,
+          "executionGas": 1342385
+        },
+        "scheduleWithdrawal rejected (wrong key)": {
+          "calldataBytes": 2756,
+          "estimatedTxGas": 1283181,
+          "executionGas": 1222285
+        },
+        "startRecovery (2 signatures)": {
+          "calldataBytes": 5220,
+          "estimatedTxGas": 2644433,
+          "executionGas": 2544509
+        },
+        "startRecovery (again)": {
+          "calldataBytes": 5220,
+          "estimatedTxGas": 2614473,
+          "executionGas": 2514513
+        },
+        "startRecoverySetReplacement (3 signatures)": {
+          "calldataBytes": 7876,
+          "estimatedTxGas": 3919057,
+          "executionGas": 3779109
+        }
+      }
+    },
+    "live": {
+      "f1600Helper": {
+        "tx": "0x681a5c2c421b42e637f76c67e739ab75390d0de35b283008a896b3450c019b4e",
+        "block": 148871208,
+        "status": "success",
+        "gasUsed": "4716328",
+        "gasUsedForL1": "0",
+        "calldataBytes": 21634,
+        "effectiveGasPriceWei": "10000000",
+        "feeWei": "47163280000000"
+      },
+      "verifier": {
+        "tx": "0x3d93089453669522861fabd9eec819765de4fca5ff3004b7afab75e362d72240",
+        "block": 148871222,
+        "status": "success",
+        "gasUsed": "5163377",
+        "gasUsedForL1": "0",
+        "calldataBytes": 24230,
+        "effectiveGasPriceWei": "10000000",
+        "feeWei": "51633770000000"
+      },
+      "keyFactory": {
+        "tx": "0x8d3b563f6e405f13baaea8aa86688b9ea7eba1fcd9d334a73086d0da3ca6e1cd",
+        "block": 149357513,
+        "status": "success",
+        "gasUsed": "1097720",
+        "gasUsedForL1": "0",
+        "calldataBytes": 5170,
+        "effectiveGasPriceWei": "10000000",
+        "feeWei": "10977200000000"
+      },
+      "vaultFactoryPrevious": {
+        "tx": "0x3a7f86a5b822c84cbec5c959e547fbb775de77f30f08cf382fcef6adfb6d0a69",
+        "block": 149357530,
+        "status": "success",
+        "gasUsed": "3445414",
+        "gasUsedForL1": "0",
+        "calldataBytes": 15963,
+        "effectiveGasPriceWei": "10000000",
+        "feeWei": "34454140000000"
+      },
+      "smokeRegisterKey": {
+        "tx": "0xf9c971f78f9cf08d1ca6dd8ad969caa27699742ab38d37799adce9bf5209e738",
+        "block": 149357640,
+        "status": "success",
+        "gasUsed": "12355455",
+        "gasUsedForL1": "0",
+        "calldataBytes": 3876,
+        "effectiveGasPriceWei": "10000000",
+        "feeWei": "123554550000000"
+      },
+      "vaultFactory": {
+        "tx": "0xb583194dbba0712d4480bf0b19fa80ee48079fecc26f39cac4117281a0bb320b",
+        "block": 149396472,
+        "status": "success",
+        "gasUsed": "3507676",
+        "gasUsedForL1": "0",
+        "calldataBytes": 16251,
+        "effectiveGasPriceWei": "10000000",
+        "feeWei": "35076760000000"
+      }
+    }
+  },
+  "gateB": {
+    "chainId": 46630,
+    "checkedAtBlock": 149396490,
+    "checkedAtTimestamp": 1793949374,
+    "keyFactory": "0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d",
+    "method": "smoke key registered through KeyFactory (on-chain proof-of-possession check); chain node eth_call accepts a fresh signature and rejects a one-bit tamper",
+    "smokeBlob": "0x0C509301730F8872B4167dA687Dd56e71B1a1DD8",
+    "smokeRecordId": "0x21f483b70b479a558f27c340c1ce7616d3cd17636b63a3570d70afe9465542f2",
+    "status": "pass",
+    "verifier": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c"
+  },
+  "reviews": {
+    "reports": [],
+    "note": "No independent review or audit report has been published. See docs/REVIEW-SCOPE.md for the scope offered to reviewers and docs/REVIEW-REQUEST.md for the request."
+  },
+  "toolkit": {
+    "name": "@quanlet/cli",
+    "files": {
+      "cli/abi/KeyFactory.json": "0xd27bc82ea766ddac34ea46fadfcb87c1bcbb713ba483c172959d97e216228275",
+      "cli/abi/MLDSA44Verifier.json": "0xb86fc502f1fceb00db935d4839cd7b16f23b3a754f21526447a292bce90b9e5e",
+      "cli/abi/PersonalVault.json": "0xe090dd4aeb0669bc9123effccb16f2404157e04be3d76f2846a3572896983199",
+      "cli/abi/VaultFactory.json": "0xa133d594a87d30fff344d6249ce2dae7f499f0f80280634ed251bec7806600e5",
+      "cli/bin/quanlet.mjs": "0xb15b7a62138af57c37c4f12d62722bb16c24bf5e79b9553a1289ed518201cd0b",
+      "cli/lib/keyfile.mjs": "0x751d4962c1c8d80a9b59fa13b8d730b2e85957cca990349c36a9a2bf45a18259",
+      "cli/lib/prepare.mjs": "0x6d2dbd125cefe4c285f016f564cdf378bfe9a021b9b8f1e97fecb6c072f0e28c",
+      "cli/lib/protocol.mjs": "0x4a185695652b9e11356b10cb3079c1a6023b1fc8c78a00ed8498439c1bed20e9",
+      "cli/lib/vectors.mjs": "0x7672d7dc5b9bd17840b27a2819f0d84ca7b6c352257b0020ebad6838e5c4057b",
+      "cli/package.json": "0xe1f5b60834b29bcf33f4859b2869a56003b150d08c57094a275d6bd9f10f53b1",
+      "cli/scripts/manifest.mjs": "0x04a86e800ba373867977e7ccde762022c75933a76556d5e7ce506e287a270b89",
+      "cli/scripts/sync.mjs": "0x52210d68a604e6f2318451483462ddf695838a24ef0479b460a425fed16920e7"
+    }
+  },
+  "liveCheck": {
+    "rpcChecked": true,
+    "block": 149396649
+  }
+}

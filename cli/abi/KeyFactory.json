@@ -1,0 +1,333 @@
+{
+ "contractName": "KeyFactory",
+ "abi": [
+  {
+   "type": "constructor",
+   "inputs": [
+    {
+     "name": "verifier_",
+     "type": "address",
+     "internalType": "contract IMLDSAVerifier"
+    },
+    {
+     "name": "f1600Helper_",
+     "type": "address",
+     "internalType": "address"
+    }
+   ],
+   "stateMutability": "nonpayable"
+  },
+  {
+   "type": "function",
+   "name": "F1600_CODEHASH",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "PREPARATION_VERSION",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint8",
+     "internalType": "uint8"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "f1600Helper",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "",
+     "type": "address",
+     "internalType": "address"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "getRecord",
+   "inputs": [
+    {
+     "name": "recordId",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "tuple",
+     "internalType": "struct KeyFactory.KeyRecord",
+     "components": [
+      {
+       "name": "keyId",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "blob",
+       "type": "address",
+       "internalType": "address"
+      },
+      {
+       "name": "blobHash",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      },
+      {
+       "name": "prepVersion",
+       "type": "uint8",
+       "internalType": "uint8"
+      },
+      {
+       "name": "ready",
+       "type": "bool",
+       "internalType": "bool"
+      }
+     ]
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "keyIdOf",
+   "inputs": [
+    {
+     "name": "rawPk",
+     "type": "bytes",
+     "internalType": "bytes"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "pure"
+  },
+  {
+   "type": "function",
+   "name": "popMessage",
+   "inputs": [
+    {
+     "name": "keyId",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "blobHash",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "preparedBlobOf",
+   "inputs": [
+    {
+     "name": "rawPk",
+     "type": "bytes",
+     "internalType": "bytes"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes",
+     "internalType": "bytes"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "recordIdOf",
+   "inputs": [
+    {
+     "name": "keyId",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "blobHash",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "pure"
+  },
+  {
+   "type": "function",
+   "name": "recordOfKey",
+   "inputs": [
+    {
+     "name": "keyId",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "registerKey",
+   "inputs": [
+    {
+     "name": "rawPk",
+     "type": "bytes",
+     "internalType": "bytes"
+    },
+    {
+     "name": "popSig",
+     "type": "bytes",
+     "internalType": "bytes"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "recordId",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "nonpayable"
+  },
+  {
+   "type": "function",
+   "name": "verifier",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "",
+     "type": "address",
+     "internalType": "contract IMLDSAVerifier"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "verifierCodehash",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "event",
+   "name": "KeyRegistered",
+   "inputs": [
+    {
+     "name": "recordId",
+     "type": "bytes32",
+     "indexed": true,
+     "internalType": "bytes32"
+    },
+    {
+     "name": "keyId",
+     "type": "bytes32",
+     "indexed": true,
+     "internalType": "bytes32"
+    },
+    {
+     "name": "blob",
+     "type": "address",
+     "indexed": false,
+     "internalType": "address"
+    },
+    {
+     "name": "blobHash",
+     "type": "bytes32",
+     "indexed": false,
+     "internalType": "bytes32"
+    },
+    {
+     "name": "prepVersion",
+     "type": "uint8",
+     "indexed": false,
+     "internalType": "uint8"
+    }
+   ],
+   "anonymous": false
+  },
+  {
+   "type": "error",
+   "name": "AlreadyRegistered",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "BadHelper",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "BadProofOfPossession",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "BadPublicKeyLength",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "BlobDeployFailed",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "DegenerateKey",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "VerifierChanged",
+   "inputs": []
+  }
+ ]
+}

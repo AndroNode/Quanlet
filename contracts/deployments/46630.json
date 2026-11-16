@@ -1,0 +1,15 @@
+{
+  "chainId": 46630,
+  "compatibleVaultFactories": [
+    "0x4e00144f85dcA5E49bcFf5386E49d4465fcC5399"
+  ],
+  "deployedAtBlock": 149396449,
+  "f1600Helper": "0xEB38AaA050e8ce2d0E56d735c607b9496af9F003",
+  "keyFactory": "0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d",
+  "keyPreparation": 1,
+  "previousKeyFactory": "0xC5a0Ca0adcb6d2C55146641bbc0fc0Ae3EC2E0f2",
+  "previousVaultFactory": "0x4e00144f85dcA5E49bcFf5386E49d4465fcC5399",
+  "vaultFactory": "0xE8cB1b0B90142C55068af0f212030f93847049B3",
+  "verifier": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c",
+  "verifierCodehash": "0x00221a5ca716f915d6209797adf624ecf15d3e6966427c40f02b9a7047c00865"
+}

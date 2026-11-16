@@ -1,0 +1,87 @@
+name: Deploy contracts
+
+# Manual only. Deploys helper, verifier, KeyFactory and VaultFactory and publishes the manifest.
+# Needs repository secret DEPLOYER_PRIVATE_KEY: a fresh testnet-only wallet. The deployed contracts
+# have no owner, so this key holds no power over them afterwards.
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: Target network
+        type: choice
+        options: [robinhood_testnet, robinhood_mainnet]
+        default: robinhood_testnet
+      mainnet_confirmation:
+        description: "Mainnet only: type I_ACCEPT_THE_MAINNET_GATES"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-contracts
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.network }}
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter @quanlet/contracts
+        working-directory: .
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.7.1
+      - name: Test before deploying
+        run: forge test
+      - name: Check the chain id
+        run: |
+          want=$([ "${{ inputs.network }}" = robinhood_mainnet ] && echo 4663 || echo 46630)
+          got=$(cast chain-id --rpc-url ${{ inputs.network }})
+          echo "chain id $got"
+          [ "$got" = "$want" ] || { echo "unexpected chain id"; exit 1; }
+      - name: Check the deployer wallet
+        run: |
+          got=$(cast wallet address --private-key "$DEPLOYER_PRIVATE_KEY")
+          echo "deployer $got"
+          [ "$got" = "$EXPECTED_DEPLOYER" ] || { echo "DEPLOYER_PRIVATE_KEY is not the agreed testnet wallet"; exit 1; }
+          echo "balance $(cast balance "$got" --ether --rpc-url ${{ inputs.network }}) ETH"
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          # Set this to the address of YOUR testnet-only deployer wallet before the first run.
+          EXPECTED_DEPLOYER: "0x0000000000000000000000000000000000000000"
+      - name: Deploy
+        run: forge script script/Deploy.s.sol --rpc-url ${{ inputs.network }} --broadcast --slow
+        env:
+          FOUNDRY_PROFILE: deploy
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          QUANLET_MAINNET_GO: ${{ inputs.mainnet_confirmation }}
+      - name: Gate B smoke test (verifier works on this chain)
+        run: |
+          forge script script/Smoke.s.sol --rpc-url ${{ inputs.network }} --broadcast --slow
+          forge script script/Smoke.s.sol --rpc-url ${{ inputs.network }}
+        env:
+          FOUNDRY_PROFILE: deploy
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+      - name: Summary
+        run: |
+          echo '### Deployed to ${{ inputs.network }}' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat deployments/*.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deployment-${{ inputs.network }}
+          path: |
+            contracts/deployments/*.json
+            contracts/broadcast/**/run-latest.json

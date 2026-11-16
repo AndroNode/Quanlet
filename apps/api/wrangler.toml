@@ -1,0 +1,33 @@
+# Quanlet: one Worker serves the website (static assets) and the API under /api.
+name = "quanlet"
+main = "src/index.ts"
+compatibility_date = "2024-11-27"
+workers_dev = true
+
+[assets]
+directory = "../web/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# Run the Worker for every request, so the homepage and static files get the same security headers as everything else.
+run_worker_first = true
+
+# Launch configuration (FR-28). Optional: without it the API serves safe defaults (demo mode).
+# To enable: `wrangler kv namespace create CONFIG`, paste the id below, uncomment, redeploy, then
+# `wrangler kv key put --binding CONFIG config '<json>' --remote`.
+# [[kv_namespaces]]
+# binding = "CONFIG"
+# id = "<namespace id>"
+
+# Alchemy (optional): /api/rpc forwards read-only calls to Alchemy's Robinhood Chain Testnet endpoint
+# when the secret ALCHEMY_API_KEY is set, and to the public RPC otherwise. Set it as a secret, never here:
+#   Cloudflare dashboard > Workers & Pages > quanlet > Settings > Variables and Secrets > Add (type Secret)
+#   or: wrangler secret put ALCHEMY_API_KEY
+
+[vars]
+# "testnet" serves Robinhood Chain testnet. "mainnet" serves chain 4663 and must ship with a mainnet build of the
+# site (pnpm --filter @quanlet/web build:mainnet); set MAINNET_RPC_URL as a secret to use a private endpoint.
+# Do not switch before the mainnet contracts are deployed, checked, and listed in packages/config (mainnetV2).
+RELEASE_MODE = "testnet"
+
+[observability]
+enabled = true

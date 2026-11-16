@@ -1,0 +1,11 @@
+{
+  "chainId": 46630,
+  "checkedAtBlock": 149396490,
+  "checkedAtTimestamp": 1793949374,
+  "keyFactory": "0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d",
+  "method": "smoke key registered through KeyFactory (on-chain proof-of-possession check); chain node eth_call accepts a fresh signature and rejects a one-bit tamper",
+  "smokeBlob": "0x0C509301730F8872B4167dA687Dd56e71B1a1DD8",
+  "smokeRecordId": "0x21f483b70b479a558f27c340c1ce7616d3cd17636b63a3570d70afe9465542f2",
+  "status": "pass",
+  "verifier": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c"
+}

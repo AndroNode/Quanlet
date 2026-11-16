@@ -1,0 +1,37 @@
+{
+  "name": "@quanlet/web",
+  "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:mainnet": "tsc --noEmit && VITE_QUANLET_NETWORK=mainnet vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'web: covered by e2e'",
+    "check:prepare": "node --experimental-strip-types scripts/prepare-check.mjs 5"
+  },
+  "dependencies": {
+    "@noble/ciphers": "2.0.1",
+    "@noble/hashes": "2.0.1",
+    "@noble/post-quantum": "0.5.4",
+    "@quanlet/config": "workspace:*",
+    "@quanlet/vault-model": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "three": "0.170.0",
+    "viem": "2.38.0",
+    "zustand": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "0.170.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

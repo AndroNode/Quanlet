@@ -1,0 +1,13 @@
+node_modules
+dist
+.wrangler
+.dev.vars
+contracts/out
+contracts/cache
+contracts/broadcast
+*.log
+.env
+__pycache__/
+
+# Not published
+docs/*.pdf

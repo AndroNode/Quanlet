@@ -1,0 +1,221 @@
+{
+ "contractName": "VaultFactory",
+ "abi": [
+  {
+   "type": "constructor",
+   "inputs": [
+    {
+     "name": "keyFactory_",
+     "type": "address",
+     "internalType": "contract KeyFactory"
+    }
+   ],
+   "stateMutability": "nonpayable"
+  },
+  {
+   "type": "function",
+   "name": "configHash",
+   "inputs": [
+    {
+     "name": "primaryRecord",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "recoveryRecords",
+     "type": "bytes32[3]",
+     "internalType": "bytes32[3]"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "pure"
+  },
+  {
+   "type": "function",
+   "name": "createVault",
+   "inputs": [
+    {
+     "name": "primaryRecord",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "recoveryRecords",
+     "type": "bytes32[3]",
+     "internalType": "bytes32[3]"
+    },
+    {
+     "name": "salt",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "validAfter",
+     "type": "uint64",
+     "internalType": "uint64"
+    },
+    {
+     "name": "validUntil",
+     "type": "uint64",
+     "internalType": "uint64"
+    },
+    {
+     "name": "setupSig",
+     "type": "bytes",
+     "internalType": "bytes"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "vault",
+     "type": "address",
+     "internalType": "address"
+    }
+   ],
+   "stateMutability": "nonpayable"
+  },
+  {
+   "type": "function",
+   "name": "keyFactory",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "",
+     "type": "address",
+     "internalType": "contract KeyFactory"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "predictAddress",
+   "inputs": [
+    {
+     "name": "primaryRecord",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "recoveryRecords",
+     "type": "bytes32[3]",
+     "internalType": "bytes32[3]"
+    },
+    {
+     "name": "salt",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "address",
+     "internalType": "address"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "function",
+   "name": "setupDigest",
+   "inputs": [
+    {
+     "name": "primaryRecord",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "recoveryRecords",
+     "type": "bytes32[3]",
+     "internalType": "bytes32[3]"
+    },
+    {
+     "name": "salt",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    },
+    {
+     "name": "validAfter",
+     "type": "uint64",
+     "internalType": "uint64"
+    },
+    {
+     "name": "validUntil",
+     "type": "uint64",
+     "internalType": "uint64"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bytes32",
+     "internalType": "bytes32"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "event",
+   "name": "VaultCreated",
+   "inputs": [
+    {
+     "name": "vault",
+     "type": "address",
+     "indexed": true,
+     "internalType": "address"
+    },
+    {
+     "name": "primaryRecord",
+     "type": "bytes32",
+     "indexed": true,
+     "internalType": "bytes32"
+    },
+    {
+     "name": "recoveryRecords",
+     "type": "bytes32[3]",
+     "indexed": false,
+     "internalType": "bytes32[3]"
+    },
+    {
+     "name": "salt",
+     "type": "bytes32",
+     "indexed": false,
+     "internalType": "bytes32"
+    }
+   ],
+   "anonymous": false
+  },
+  {
+   "type": "error",
+   "name": "AlreadyDeployed",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "BadInterval",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "BadSetupSignature",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "KeyNotReady",
+   "inputs": []
+  },
+  {
+   "type": "error",
+   "name": "RequestNotAccepted",
+   "inputs": []
+  }
+ ]
+}

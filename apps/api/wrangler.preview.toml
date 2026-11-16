@@ -1,0 +1,21 @@
+# Design preview: the same Worker and site build, served on its own hostname so the production site
+# (quanlet.xyz, wrangler.toml) is untouched. Search engines are asked not to index it.
+#   npx wrangler deploy -c wrangler.preview.toml
+name = "quanlet-preview"
+main = "src/index.ts"
+compatibility_date = "2024-11-27"
+workers_dev = false
+routes = [{ pattern = "preview.quanlet.xyz", custom_domain = true }]
+
+[assets]
+directory = "../web/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[vars]
+RELEASE_MODE = "testnet"
+PREVIEW = "1"
+
+[observability]
+enabled = true

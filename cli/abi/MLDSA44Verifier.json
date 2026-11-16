@@ -1,0 +1,50 @@
+{
+ "contractName": "MLDSA44Verifier",
+ "abi": [
+  {
+   "type": "constructor",
+   "inputs": [
+    {
+     "name": "f1600Helper",
+     "type": "address",
+     "internalType": "address"
+    }
+   ],
+   "stateMutability": "nonpayable"
+  },
+  {
+   "type": "function",
+   "name": "verify",
+   "inputs": [
+    {
+     "name": "pkBlob",
+     "type": "address",
+     "internalType": "address"
+    },
+    {
+     "name": "message",
+     "type": "bytes",
+     "internalType": "bytes"
+    },
+    {
+     "name": "signature",
+     "type": "bytes",
+     "internalType": "bytes"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "",
+     "type": "bool",
+     "internalType": "bool"
+    }
+   ],
+   "stateMutability": "view"
+  },
+  {
+   "type": "error",
+   "name": "BadHelper",
+   "inputs": []
+  }
+ ]
+}

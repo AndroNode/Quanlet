@@ -1,0 +1,140 @@
+{
+  "protocolVersion": 2,
+  "chainId": 46630,
+  "network": "Robinhood Chain testnet",
+  "sourceCommit": "68bb36b9cff812049bd933f339108863da6672fa",
+  "compiler": {
+    "solc": "0.8.30",
+    "viaIR": true,
+    "evmVersion": "cancun",
+    "optimizer": true,
+    "optimizerRuns": 10000,
+    "bytecodeHash": "none",
+    "cborMetadata": false
+  },
+  "vaultCreationCodeHash": "0xea0432ad261fc8ad7e2a32c2223513cc7bfcd407c16e21f01b1cb25716d2a59f",
+  "dependencyManifestHash": {
+    "eth": "0x2b688d8f1465d1bda9e667301bec958caa367f20653dad58b5e59e5f7713675b",
+    "tokens": "0x33fe766537c5a0dc5c92045da1ccca4310615dee0b5d23f51fe1f9073c53db03"
+  },
+  "supportedAssets": {
+    "eth": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "tokens": [
+      "0x0000000000000000000000000000000000000000",
+      "0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0",
+      "0x3b8262A63d25f0477c4DDE23F83cfe22Cb768C93",
+      "0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02",
+      "0x71178BAc73cBeb415514eB542a8995b82669778d",
+      "0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E"
+    ]
+  },
+  "contracts": {
+    "KeyFactoryV2": {
+      "address": "0x3cc65726274462e15c031956dD0560400e25Caf5",
+      "liveCodehash": "0x8860be63300264b8dddda122e403987486378c514da274cb3ab68ae84193edc3",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "VaultFactoryV2_eth": {
+      "address": "0xE8A8F2F714f06fdd83630958FD23503872549db3",
+      "liveCodehash": "0x32d954c5978cfdaa09104d883186516bdf7f2380b446cb02b72c89d3cb091f86",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "VaultFactoryV2_tokens": {
+      "address": "0x8bA8297d0ddd6DE27E127C0b1B18102805AE99bC",
+      "liveCodehash": "0x1628ebf3141523d4384804d68a74f3eb3af444ac6bd1d1b12b64fd1b993407f2",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "vaultCodeStore1": {
+      "address": "0x1a4104a075b3CF6b9ecC86015462893beA2B43e7",
+      "liveCodehash": "0x6902228af3c24291946d384f835e482cded0552607f8f410071591db0e132524",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": false
+    },
+    "vaultCodeStore2": {
+      "address": "0x741d809e810dCFdEE6D97cC4866d2e87429E69aC",
+      "liveCodehash": "0x612185e399b14bd2011ac0d1f45ae32c12729cd165146648fc75a58818a17086",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": false
+    },
+    "MLDSA44Verifier": {
+      "address": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c",
+      "liveCodehash": "0x00221a5ca716f915d6209797adf624ecf15d3e6966427c40f02b9a7047c00865",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "F1600Helper": {
+      "address": "0xEB38AaA050e8ce2d0E56d735c607b9496af9F003",
+      "liveCodehash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": false
+    },
+    "smokeVault": {
+      "address": "0xDf9bF0A5d817685aAD1644a82C50B981A65c7bDA",
+      "liveCodehash": "0xeb8f2795062320964d351c186037118652517e4f11f4e057e843e170a9f5b092",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    }
+  },
+  "source": {
+    "files": {
+      "contracts/src/v2/QuanletV2.sol": "0162f385d203b58a6ad1e1f526628a87b586b66b3d79334e4c16021a50245f90",
+      "contracts/src/v2/KeyFactoryV2.sol": "e47034f61e8569c3ed14e7eeb4d6060c09612d0dbc23fe67278141ecd3db4e2b",
+      "contracts/src/v2/VaultFactoryV2.sol": "341908926ce302d06fc40d9d26e66d297f057233a6e620a6d4ec4e9c3f4140ab",
+      "contracts/src/v2/PersonalVaultV2.sol": "d13bf3d20a3718a93f75e18babd600f003fd8119bd105e7f0b32c2c2732bdb34",
+      "contracts/src/KeyPrep.sol": "f0f7e6ae332ae0a556be6f616f2198959e28e0d719130253374c01d18b774224",
+      "contracts/foundry.toml": "c0ff0a323935b7f77a00b17439969f28de737ae094692c82295cddc9ea59a3f8"
+    }
+  },
+  "verifier": {
+    "files": {
+      "contracts/src/verifier/Decode.sol": "62800c6dc97625581add1aaae8650f344fd1f165f7ac53d2632dc5c995758a9f",
+      "contracts/src/verifier/FastKeccak170.sol": "a0b8b0c01542264b192b3697f5e2d078dd173506b89fd824df32707e6ee2c3cd",
+      "contracts/src/verifier/IMLDSAVerifier.sol": "de2461a26d1ed4306a6888e998d06c725960f6556a945516e9d93f7564fcf379",
+      "contracts/src/verifier/InvNtt.sol": "b097bdd5a4881559abe91303239b3f12e1a2a74be48894b7134efc48be0a125c",
+      "contracts/src/verifier/LICENSE-fireblocks": "819c7c05673a72f38824225d46ac36068272a416874f9f8af62d3dd54ac672fe",
+      "contracts/src/verifier/MLDSA44Verifier.sol": "e73fbc14792d8a48869476e54ad58cae2b78dab0930a9f0bda0aa1363db7176e",
+      "contracts/src/verifier/Ntt.sol": "87b2d1b4d88312b40694163c0656e5435d06221a18625cce65dbcf1f9674795f",
+      "contracts/helpers/f1600_170.hex": "f26320c4be54bdf71270d0ca92a6cf665966f0a320b84676aa75d5fa3dc612c4"
+    }
+  },
+  "client": {
+    "files": {
+      "apps/web/src/testnet/v2/chain.ts": "00da85f0eaee80d6d0991bb42ae1cc0441aabad4aba3e0c1ca9ac6fa248fa316",
+      "apps/web/src/testnet/v2/keyfile.ts": "ff31b7671ef8759c94143f9efd87ea8f85a6fd1e910278ff9e86260be1f277ad",
+      "apps/web/src/testnet/v2/profile.ts": "474a60b58589294f96e257469600926947f1b4bbc13a90225b86e665cf3f117e",
+      "apps/web/src/testnet/chain.ts": "6b4fcef03030f8ad2202e4dfbc078feb0c2d384da4517bb89c43271351f20aec",
+      "apps/web/src/testnet/keyfile.ts": "6c609b9cc8ca8ed93716485e32a7ab8e950ee876da2369d67cf36bc813a2f05e"
+    }
+  },
+  "evidence": {
+    "foundryTests": "98 passed (forge test, includes stateful invariant run with real ML-DSA-44 signatures)",
+    "forkEndToEnd": "61/61 website flow checks against an anvil fork of chain 46630",
+    "liveSmoke": "contracts/deployments/46630.v2.gate-b.json",
+    "gas": "contracts/deployments/gas-foundry-v2.json"
+  },
+  "mainnetChecks": {
+    "chainId": 4663,
+    "maxCodeSize": 98304,
+    "cancunOpcodes": [
+      "PUSH0",
+      "MCOPY",
+      "TSTORE"
+    ],
+    "multicall3": "0xcA11bde05977b3631167028862bE2a173976CA11",
+    "deployDryRunGas": 24943769,
+    "checkedAt": "2026-11-16"
+  }
+}

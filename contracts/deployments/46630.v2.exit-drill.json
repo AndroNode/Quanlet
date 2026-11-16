@@ -1,0 +1,117 @@
+{
+  "drill": "protocol 2.0 exit and backup restoration, toolkit only",
+  "chainId": 46630,
+  "startedAt": "2026-11-16T17:02:25.815Z",
+  "payer": "0x74AD66409a47a2cA6099E8cdd41ff2cf1aeE337d",
+  "steps": [
+    "five keys made and backed up on machine A",
+    "backups copied to machine B and restored there (each opened and test-signed); machine B signs from here on",
+    "five keys registered and activated in KeyFactoryV2, each proving possession",
+    "vault 0xb417F32f809db281358aC403148053A2f91483f5 created by all five keys: protected transfers execute at once, FAST up to 0.000200 ETH per transfer and 0.000400 ETH in total to the payer",
+    "0.001 ETH deposited",
+    "FAST: 0.000200 ETH paid to the payer with the primary key alone",
+    "exit: the remaining 0.0008 ETH left the vault in one protected transfer signed by primary and approver; vault balance 0"
+  ],
+  "keyIds": {
+    "primary": "0x1e4113f005fc1eeef2b2045486650730f3f89349b2db85b0f60402d42b1459b6",
+    "approver": "0xe02acfd67c0a15e191b596169e7e349e20cd9e9536e6b72a8cf5230e34a3268c",
+    "guardian-1": "0x317673ee13d7f8a1faf7f622157855553e3e065522547be782ddcb9ccdf30ba4",
+    "guardian-2": "0x153984e0e4274d0138e294244f933b46a1d2dd8340fdc33c6823bdbf66495cd8",
+    "guardian-3": "0x8b5f670d6fe47398ec1b4683270117b5b131ab4f93a41f69109cd490affbd52b"
+  },
+  "vault": "0xb417F32f809db281358aC403148053A2f91483f5",
+  "inspect": [
+    "vault            0xb417F32f809db281358aC403148053A2f91483f5",
+    "made by          VaultFactoryV2 0x8bA8297d0ddd6DE27E127C0b1B18102805AE99bC",
+    "state            Active",
+    "epochs           authority 1, policy 1, execution 1",
+    "nonces           spend 2, admin 0, P safety 0, A safety 0, recovery 0",
+    "primary          0x1e4113f005fc1eeef2b2045486650730f3f89349b2db85b0f60402d42b1459b6",
+    "approver         0xe02acfd67c0a15e191b596169e7e349e20cd9e9536e6b72a8cf5230e34a3268c",
+    "guardian 1       0x317673ee13d7f8a1faf7f622157855553e3e065522547be782ddcb9ccdf30ba4",
+    "guardian 2       0x153984e0e4274d0138e294244f933b46a1d2dd8340fdc33c6823bdbf66495cd8",
+    "guardian 3       0x8b5f670d6fe47398ec1b4683270117b5b131ab4f93a41f69109cd490affbd52b",
+    "verifier         0xb968d948271dc4F0DE95E904E7f6B09AE23D780c  code hash matches the vault binding",
+    "assets",
+    "  ETH    balance 0, FAST spent 0.0002, FAST left now 0.0002",
+    "  PLTR   balance 0, FAST spent 0, FAST left now 0",
+    "  NFLX   balance 0, FAST spent 0, FAST left now 0",
+    "  AMZN   balance 0, FAST spent 0, FAST left now 0",
+    "  AMD    balance 0, FAST spent 0, FAST left now 0",
+    "  TSLA   balance 0, FAST spent 0, FAST left now 0",
+    "rules",
+    "  delay        protected transfers wait no delay",
+    "  FAST         on (resumes if suspended)",
+    "  allowance    ETH: lifetime ceiling 0.0004 ETH, at most 0.0002 ETH per transfer",
+    "               valid 2026-11-16T17:02:54Z (1794848574) to 2026-11-23T17:02:54Z (1795453374)",
+    "               only to 0x74AD66409a47a2cA6099E8cdd41ff2cf1aeE337d",
+    "  FAST fees    none"
+  ],
+  "transactions": [
+    {
+      "label": "register primary",
+      "hash": "0xd4edd2e5b2460359f9673cccc5f584b526a8cbd553d8ea7d2aefbd28b2f73f4c",
+      "block": 154152460,
+      "gasUsed": "12319381",
+      "feeWei": "123193810000000"
+    },
+    {
+      "label": "register approver",
+      "hash": "0x54f3810787f706d0f79d8dce2dd654328f6039dd18f8a6a733262df248bf5dcf",
+      "block": 154152510,
+      "gasUsed": "12321537",
+      "feeWei": "123215370000000"
+    },
+    {
+      "label": "register guardian-1",
+      "hash": "0x87f2dcdbd141eab9083815642de09dc15a608bf20bc59a7805c978f81002eb91",
+      "block": 154152561,
+      "gasUsed": "12322775",
+      "feeWei": "123227750000000"
+    },
+    {
+      "label": "register guardian-2",
+      "hash": "0xbd6010a081da97e43e1d56511ebd077ec31076b3035cb3ffab0f693f88ff315c",
+      "block": 154152610,
+      "gasUsed": "12319282",
+      "feeWei": "123192820000000"
+    },
+    {
+      "label": "register guardian-3",
+      "hash": "0xff0e5f9a6e6b3d5edd45a23603dfffe342c0d5e8a005b364e95eb0ad19ea7b05",
+      "block": 154152659,
+      "gasUsed": "12320382",
+      "feeWei": "123203820000000"
+    },
+    {
+      "label": "create vault",
+      "hash": "0x88d935efae9f8193a01e143fc63eb9798e441dd9b7a95a2bb8db57bfbaff0ae0",
+      "block": 154152776,
+      "gasUsed": "12896604",
+      "feeWei": "128966040000000"
+    },
+    {
+      "label": "deposit",
+      "hash": "0x5026bd1a6a45713612caa31c34e8d0f5e20b4ab9df4030202ce62de2784c42ff",
+      "block": 154152801,
+      "gasUsed": "22479",
+      "feeWei": "224790000000"
+    },
+    {
+      "label": "FAST transfer",
+      "hash": "0x97541881414b5c872dfafff7442a779e2c6f9a9760b66c4dc913ad7d589574f9",
+      "block": 154152853,
+      "gasUsed": "1378719",
+      "feeWei": "13787190000000"
+    },
+    {
+      "label": "exit",
+      "hash": "0x2e04d364e9afe5a9ee4b1c9f7c1cc4d31190d2af7a5b544e2ee4f7f518af7de2",
+      "block": 154152920,
+      "gasUsed": "2590196",
+      "feeWei": "25901960000000"
+    }
+  ],
+  "totalFeeWei": "784913550000000",
+  "finishedAt": "2026-11-16T17:04:51.771Z"
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quanlet · Post-quantum asset protection on Robinhood Chain</title>
+    <meta name="description" content="Quanlet is a self-custody vault for Robinhood Chain. Funds move only with post-quantum ML-DSA-44 signatures from two keys you hold, with a finite FAST allowance and 2-of-3 guardian recovery. Live on testnet; mainnet is not live." />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#050506" />
+    <meta property="og:title" content="Quanlet · Post-quantum asset protection" />
+    <meta property="og:description" content="A self-custody vault for Robinhood Chain that moves funds only on post-quantum signatures. Live on testnet." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" href="/fonts/Archivo-wdth-wght.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/FamiljenGrotesk-wght.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Apply motion preference before first paint (FR-07).
+      try {
+        var m = localStorage.getItem('quanlet.motion');
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.documentElement.dataset.motion = m ? m : reduce ? 'off' : 'on';
+      } catch (e) { document.documentElement.dataset.motion = 'on'; }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>Quanlet needs JavaScript to run.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

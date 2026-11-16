@@ -1,0 +1,107 @@
+{
+  "cancelSecurityChange (2 signatures)": {
+    "calldataBytes": 5188,
+    "estimatedTxGas": 2546789,
+    "executionGas": 2447389
+  },
+  "cancelWithdrawal": {
+    "calldataBytes": 2628,
+    "estimatedTxGas": 1287248,
+    "executionGas": 1226408
+  },
+  "createVault": {
+    "calldataBytes": 2724,
+    "estimatedTxGas": 4100003,
+    "executionGas": 4037267
+  },
+  "executeWithdrawal (ETH)": {
+    "calldataBytes": 36,
+    "estimatedTxGas": 60782,
+    "executionGas": 39218
+  },
+  "finalizeSecurityChange (primary)": {
+    "calldataBytes": 4,
+    "estimatedTxGas": 30638,
+    "executionGas": 9574
+  },
+  "finalizeSecurityChange (recovery set)": {
+    "calldataBytes": 4,
+    "estimatedTxGas": 36529,
+    "executionGas": 15465
+  },
+  "invalidatePendingRequests": {
+    "calldataBytes": 2596,
+    "estimatedTxGas": 1305209,
+    "executionGas": 1244881
+  },
+  "registerKey": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12354901,
+    "executionGas": 12273901
+  },
+  "registerKey#1": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12350242,
+    "executionGas": 12269230
+  },
+  "registerKey#2": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12350018,
+    "executionGas": 12268922
+  },
+  "registerKey#3": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12350511,
+    "executionGas": 12269451
+  },
+  "registerKey#4": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12352413,
+    "executionGas": 12271221
+  },
+  "registerKey#5": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12352862,
+    "executionGas": 12271610
+  },
+  "registerKey#6": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12351749,
+    "executionGas": 12270641
+  },
+  "registerKey#7": {
+    "calldataBytes": 3876,
+    "estimatedTxGas": 12349434,
+    "executionGas": 12268494
+  },
+  "scheduleWithdrawal": {
+    "calldataBytes": 2756,
+    "estimatedTxGas": 1405435,
+    "executionGas": 1344395
+  },
+  "scheduleWithdrawal (with relay fee)": {
+    "calldataBytes": 2756,
+    "estimatedTxGas": 1403509,
+    "executionGas": 1342385
+  },
+  "scheduleWithdrawal rejected (wrong key)": {
+    "calldataBytes": 2756,
+    "estimatedTxGas": 1283181,
+    "executionGas": 1222285
+  },
+  "startRecovery (2 signatures)": {
+    "calldataBytes": 5220,
+    "estimatedTxGas": 2644433,
+    "executionGas": 2544509
+  },
+  "startRecovery (again)": {
+    "calldataBytes": 5220,
+    "estimatedTxGas": 2614473,
+    "executionGas": 2514513
+  },
+  "startRecoverySetReplacement (3 signatures)": {
+    "calldataBytes": 7876,
+    "estimatedTxGas": 3919057,
+    "executionGas": 3779109
+  }
+}
