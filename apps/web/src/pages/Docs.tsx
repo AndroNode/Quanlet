@@ -199,7 +199,7 @@ const SECTIONS: Array<{ id: string; title: string; ref: string; body: ReactNode 
     ref: '§§04, 13, 16',
     body: (
       <p>
-        Vault contracts are non-upgradeable, with no proxy administrator, operator pause, platform withdrawal power or reset key. Owners change only the policy fields and roles the code allows. Migration is an ordinary authorized transfer to a separately deployed vault. A serious flaw cannot be patched in place. The protocol calls for a standalone command-line toolkit and local signing interface so owners can act through any RPC if the website, relay or alerts fail; neither is published yet.
+        Vault contracts are non-upgradeable, with no proxy administrator, operator pause, platform withdrawal power or reset key. Owners change only the policy fields and roles the code allows. Migration is an ordinary authorized transfer to a separately deployed vault. A serious flaw cannot be patched in place. The protocol calls for a standalone command-line toolkit so owners can act through any RPC if the website, relay or alerts fail. It is published with the source code (cli/ in the repository); a separate local signing interface is not.
       </p>
     ),
   },
@@ -307,7 +307,7 @@ export default function Docs() {
               <li>No independent cryptography or smart-contract review has been done yet, for protocol 1.0 or 2.0. An internal self-review of the protocol 1.0 testnet contracts found and fixed one medium issue (a relay fee could be skipped by a re-entering recipient).</li>
               <li>The onchain verifier gives NIST's result on all 60 official ML-DSA-44 signature-verification test vectors (ACVP). That shows it follows FIPS 204 on those cases; it is not a review.</li>
               <li>Protocol 2.0 gas, measured in Foundry: registering and activating a key about 12.6 million, creating a vault with five consents about 13.5 million, a FAST transfer about 1.7 million, a protected transfer about 3.2 million, and starting a recovery about 6.4 million.</li>
-              <li>The standalone toolkit, local signing interface and source repository are not published yet.</li>
+              <li>The source code and the standalone toolkit are published on GitHub (contracts MIT, everything else AGPL-3.0). A separate local signing interface is not published.</li>
               <li>A bug bounty programme is drafted but not funded. It must be funded before any beta that accepts real assets.</li>
               <li>The official X account and support channels are not announced.</li>
             </ul>

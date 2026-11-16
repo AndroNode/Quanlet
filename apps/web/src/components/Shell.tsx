@@ -347,6 +347,9 @@ export function Footer() {
             <Link to="/how-it-works">How it works</Link>
             <Link to="/docs">Docs and FAQ</Link>
             <Link to="/docs#gaps">Known gaps</Link>
+            <a href="https://github.com/AndroNode/Quanlet" target="_blank" rel="noopener noreferrer">
+              Source code
+            </a>
           </nav>
           <div className="stack footer-legal">
             <span className="caps">Status</span>
