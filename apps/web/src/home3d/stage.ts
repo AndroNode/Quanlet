@@ -99,9 +99,22 @@ void main() {
     p += normalize(p) * w * 0.32 * uShield;
     hot = max(hot, w * uShield);
   }
-  vec3 dp = p - uPointer;
-  float dl = length(dp);
-  p += (dp / max(dl, 0.001)) * uPointerAmt * 0.55 * exp(-dl * dl * 1.6);
+  // pointer: a lattice lens. Inside it the points stop drifting and settle onto a regular grid (the lattice the
+  // signatures are built on), lift toward the viewer and light up; a thin ring of brighter points marks its edge.
+  if (uPointerAmt > 0.001) {
+    vec2 dp = p.xy - uPointer.xy;
+    float dl = length(dp);
+    float lens = smoothstep(1.05, 0.25, dl) * uPointerAmt;
+    if (lens > 0.0) {
+      vec3 q = (floor(p / 0.26) + 0.5) * 0.26;
+      p = mix(p, q, lens * 0.92);
+      p.z += lens * 0.35;
+      hot = max(hot, lens * 0.5);
+    }
+    float ring = exp(-pow((dl - 1.1) * 7.0, 2.0)) * uPointerAmt;
+    p.xy += (dp / max(dl, 0.001)) * ring * 0.05;
+    hot = max(hot, ring * 0.45);
+  }
 
   float w3 = uIs3A * (1.0 - t) + uIs3B * t;
   if (w3 > 0.001) {
@@ -150,6 +163,31 @@ void main() {
 }
 `;
 
+/** The lens outline that follows the mouse: a ring of dots with four ticks, lit by a sweep that goes round it. */
+const RETICLE_VERT = /* glsl */ `
+uniform float uAmt, uSweep, uPR;
+attribute float aAng;
+attribute float aTick;
+varying float vA;
+void main() {
+  float d = mod(aAng - uSweep, 6.2831853);
+  float lit = 0.4 + 0.6 * exp(-d * 1.4);
+  vA = uAmt * mix(lit, 0.9, aTick);
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mv;
+  gl_PointSize = (aTick > 0.5 ? 4.6 : 3.4) * uPR * (0.8 + lit * 0.6);
+}
+`;
+const RETICLE_FRAG = /* glsl */ `
+varying float vA;
+void main() {
+  float r = length(gl_PointCoord - 0.5);
+  if (r > 0.5) discard;
+  vec3 o = vec3(0.92, 0.86, 1.0) * smoothstep(0.5, 0.1, r) * min(1.0, vA * 1.4);
+  gl_FragColor = vec4(o, max(o.r, max(o.g, o.b)));
+}
+`;
+
 const ease = (t: number) => t * t * (3 - 2 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const lerpV = (a: readonly number[], b: readonly number[], t: number) => a.map((v, i) => lerp(v, b[i] ?? v, t));
@@ -194,6 +232,8 @@ export class Stage {
   private geo = new THREE.BufferGeometry();
   private glow: THREE.Sprite;
   private streak: THREE.Line;
+  private reticle!: THREE.Points;
+  private reticleMat!: THREE.ShaderMaterial;
   readonly formations: ReturnType<typeof buildFormations>;
   private pair = [-1, -1];
   private s = 0;
@@ -331,6 +371,46 @@ export class Stage {
     this.streak.frustumCulled = false;
     this.streak.visible = false;
     this.scene.add(this.streak);
+
+    // the lens outline for the mouse
+    {
+      const pos: number[] = [];
+      const ang: number[] = [];
+      const tick: number[] = [];
+      const R = 1.1;
+      for (let i = 0; i < 96; i += 1) {
+        const a = (i / 96) * Math.PI * 2;
+        if (i % 24 === 0) continue; // a gap where each tick starts
+        pos.push(Math.cos(a) * R, Math.sin(a) * R, 0);
+        ang.push(a);
+        tick.push(0);
+      }
+      for (let k = 0; k < 4; k += 1) {
+        const a = (k / 4) * Math.PI * 2;
+        for (const r of [R - 0.04, R - 0.13, R - 0.22]) {
+          pos.push(Math.cos(a) * r, Math.sin(a) * r, 0);
+          ang.push(a);
+          tick.push(1);
+        }
+      }
+      const rg = new THREE.BufferGeometry();
+      rg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      rg.setAttribute('aAng', new THREE.Float32BufferAttribute(ang, 1));
+      rg.setAttribute('aTick', new THREE.Float32BufferAttribute(tick, 1));
+      this.reticleMat = new THREE.ShaderMaterial({
+        vertexShader: RETICLE_VERT,
+        fragmentShader: RETICLE_FRAG,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        ...additive,
+        uniforms: { uAmt: { value: 0 }, uSweep: { value: 0 }, uPR: { value: this.renderer.getPixelRatio() } },
+      });
+      this.reticle = new THREE.Points(rg, this.reticleMat);
+      this.reticle.frustumCulled = false;
+      this.reticle.visible = false;
+      this.scene.add(this.reticle);
+    }
 
     if (opts.reduced || opts.startTime !== undefined) this.intro = 1;
     this.time = opts.startTime ?? 0;
@@ -481,7 +561,7 @@ export class Stage {
     this.camera.updateMatrixWorld();
     u.uScale.value = this.h / 2 / tanH;
 
-    // pointer: a soft push in the lattice and the mark
+    // pointer: the lattice lens follows the mouse (see the vertex shader)
     if (this.hasPointer && !reduced) {
       this.ray.setFromCamera(this.mouse, this.camera);
       this.ray.ray.intersectPlane(this.plane, this.pointerT);
@@ -489,6 +569,12 @@ export class Stage {
       this.pointerAmt += (K((k) => k.pointer) - this.pointerAmt) * Math.min(1, dt * 3);
     } else this.pointerAmt *= 0.9;
     u.uPointerAmt.value = this.pointerAmt;
+    const pv = this.u.uPointer.value;
+    this.reticle.visible = this.pointerAmt > 0.01;
+    this.reticle.position.set(pv.x, pv.y, 0.4);
+    this.reticle.rotation.z = this.time * 0.18;
+    this.reticleMat.uniforms.uAmt!.value = this.pointerAmt;
+    this.reticleMat.uniforms.uSweep!.value = (this.time * 1.4) % (Math.PI * 2);
 
     // the mark is drawn by points and turns gently on its own
     const tq = reduced ? 0 : this.time;
