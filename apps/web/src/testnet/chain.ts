@@ -21,6 +21,7 @@ import {
 } from 'viem';
 import { DEFAULT_CONFIG } from '@quanlet/config';
 import { rpc, type Eip1193 } from '../wallet';
+import { NET } from '../net';
 import { prepareBlob } from './prepare';
 
 // ------------------------------------------------------------------ deployment
@@ -35,7 +36,8 @@ const fromEnv = (() => {
   }
 })();
 const dep = DEFAULT_CONFIG.deployments.testnet!;
-const TESTNET_CHAIN_ID = DEFAULT_CONFIG.networks.testnet.chainId;
+/** The chain this build serves (net.ts): testnet, or mainnet on a mainnet build. Every send checks it. */
+const TARGET_CHAIN_ID = NET.chainId;
 export const DEPLOYMENT: Deployment = fromEnv ?? { keyFactory: dep.keyFactory as Address, vaultFactory: dep.vaultFactory as Address, verifier: dep.verifier as Address };
 /** Key backups made for these VaultFactory addresses still open (same KeyFactory, so the records still count). */
 export const KEYFILE_FACTORIES: string[] = [DEPLOYMENT.vaultFactory, ...(fromEnv ? [] : (dep.compatibleVaultFactories ?? []))].map((a) => a.toLowerCase());
@@ -295,15 +297,15 @@ export async function send(provider: Eip1193, from: Address, tx: Tx, onHash?: (h
   // Ask the wallet itself, right before sending: never trust a cached network for a transaction that may carry ETH.
   const live = await provider.request({ method: 'eth_chainId' }).catch(() => null);
   const liveId = typeof live === 'string' ? parseInt(live, 16) : typeof live === 'number' ? live : NaN;
-  if (liveId !== TESTNET_CHAIN_ID) {
-    throw new ChainError(`Your wallet is not on ${DEFAULT_CONFIG.networks.testnet.name} (chain ${TESTNET_CHAIN_ID}). Switch networks, then try again. Nothing was sent.`);
+  if (liveId !== TARGET_CHAIN_ID) {
+    throw new ChainError(`Your wallet is not on ${NET.name} (chain ${TARGET_CHAIN_ID}). Switch networks, then try again. Nothing was sent.`);
   }
   let hash: Hex;
   try {
     hash = (await provider.request({
       method: 'eth_sendTransaction',
       // chainId lets the wallet refuse if the network changes between this check and its confirmation.
-      params: [{ from, to: tx.to, data: tx.data, value: tx.value ? '0x' + tx.value.toString(16) : '0x0', chainId: '0x' + TESTNET_CHAIN_ID.toString(16) }],
+      params: [{ from, to: tx.to, data: tx.data, value: tx.value ? '0x' + tx.value.toString(16) : '0x0', chainId: '0x' + TARGET_CHAIN_ID.toString(16) }],
     })) as Hex;
   } catch (e) {
     throw new ChainError(explain(e, book));

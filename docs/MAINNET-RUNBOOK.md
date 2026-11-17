@@ -59,11 +59,12 @@ privileged, so unused contracts are harmless).
 
 ## 4. Verify the source on the explorer
 
-For each contract in `4663.v2.json` (KeyFactoryV2, VaultFactoryV2, MLDSA44Verifier):
+For each contract in `4663.v2.json` (KeyFactoryV2, VaultFactoryV2, MLDSA44Verifier), through Sourcify, which the
+Blockscout explorer reads (its own API sits behind a browser check that scripts cannot pass):
 
 ```sh
 forge verify-contract <address> <path>:<Contract> --chain 4663 --rpc-url robinhood_mainnet \
-  --verifier blockscout --verifier-url https://robinhoodchain.blockscout.com/api/ --guess-constructor-args --watch
+  --verifier sourcify --guess-constructor-args --watch
 ```
 
 The helper and the code stores are raw bytecode with no Solidity source; the release manifest records their code

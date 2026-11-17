@@ -5,6 +5,10 @@ import { canRun3D, frames, loadStageModule, newLoadState, type LoadState } from 
 import { LatticeLoader } from '../home3d/LatticeLoader';
 import type { Stage } from '../home3d/stage';
 import '../home3d/home.css';
+import { IS_MAINNET, VAULTS_OPEN } from '../net';
+
+/** The vault button's words: the vault is real on mainnet, practice on testnet. */
+const OPEN_VAULT = IS_MAINNET ? 'Open your vault' : 'Open the testnet vault';
 
 /**
  * The landing page is one scroll-driven story told by a single 3D body behind the page (home3d/stage.ts):
@@ -65,7 +69,14 @@ const BAD_DAYS: Array<{ title: string; body: string; out: string; hit?: string[]
 ];
 
 const FAQ: Array<[string, string]> = [
-  ['Is Quanlet live?', 'On testnet, yes: the contracts run on Robinhood Chain testnet and anyone can try them. Mainnet is not live, and no real funds should be sent to any address claiming otherwise.'],
+  [
+    'Is Quanlet live?',
+    IS_MAINNET && VAULTS_OPEN
+      ? 'Yes. Quanlet runs on Robinhood Chain mainnet, for ETH only. The vault contracts have no owner and cannot be paused or upgraded; their addresses are on the Docs page.'
+      : IS_MAINNET
+        ? 'Not yet. The mainnet contracts are being deployed; no real funds should be sent to any address claiming otherwise.'
+        : 'On testnet, yes: the contracts run on Robinhood Chain testnet and anyone can try them. Mainnet is not live, and no real funds should be sent to any address claiming otherwise.',
+  ],
   ['Does connecting my wallet protect it?', 'No. Only assets you move into a Quanlet vault are protected. Connecting a wallet only lets it pay gas and send what you approve.'],
   ['Do I need a token?', 'No. Vaults, signing, payments and recovery work without any token, and no token has been announced.'],
   ['What doesn\u2019t Quanlet protect?', 'Only assets inside a vault, and only who may move them. It does not make Robinhood Chain, bridges, token issuers or your devices quantum-resistant. If you lose both spending keys and two guardians, nobody can recover the funds, including the Quanlet team, which holds no keys to your vault.'],
@@ -495,13 +506,13 @@ export default function Home() {
           </p>
           <div className="hero3-cta">
             <Link className="btn primary lg" to="/vault">
-              Open the testnet vault
+              {OPEN_VAULT}
             </Link>
             <a className="btn lg" href="#problem">
               See how it works
             </a>
             <p className="hero3-status">
-              <span className="dot live" /> Live on testnet. Mainnet is not live yet.
+              <span className="dot live" /> {IS_MAINNET ? 'Live on Robinhood Chain mainnet. ETH only.' : 'Live on testnet. Mainnet is not live yet.'}
             </p>
           </div>
         </div>
@@ -635,7 +646,7 @@ export default function Home() {
           </h2>
           <p className="end3-tag">Post-quantum asset protection on Robinhood Chain</p>
           <Link className="btn primary lg" to="/vault">
-            Open the testnet vault
+            {OPEN_VAULT}
           </Link>
         </div>
       </section>

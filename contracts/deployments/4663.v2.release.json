@@ -1,0 +1,120 @@
+{
+  "protocolVersion": 2,
+  "chainId": 4663,
+  "network": "Robinhood Chain",
+  "sourceCommit": "fdb620fca9d84130a2d8b2fba097a635b3b63681",
+  "deployedAtBlock": 116352066,
+  "compiler": {
+    "solc": "0.8.30",
+    "viaIR": true,
+    "evmVersion": "cancun",
+    "optimizer": true,
+    "optimizerRuns": 10000,
+    "bytecodeHash": "none",
+    "cborMetadata": false
+  },
+  "vaultCreationCodeHash": "0xea0432ad261fc8ad7e2a32c2223513cc7bfcd407c16e21f01b1cb25716d2a59f",
+  "dependencyManifestHash": "0xe22db4f2d2ebccc77a8abc35d94f0f3272d4e6aba0c048c72dbe1272c723710e",
+  "supportedAssets": [
+    "0x0000000000000000000000000000000000000000"
+  ],
+  "contracts": {
+    "KeyFactoryV2": {
+      "address": "0xC5a0Ca0adcb6d2C55146641bbc0fc0Ae3EC2E0f2",
+      "liveCodehash": "0x8860be63300264b8dddda122e403987486378c514da274cb3ab68ae84193edc3",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "VaultFactoryV2": {
+      "address": "0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d",
+      "liveCodehash": "0xa1e9f2ef01d8a4fe6a1680b172d643b1297840cfaf30b1826daa6f66eb86545b",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "vaultCodeStore1": {
+      "address": "0xb9CE5e041f3b943E7421EbD523a4019C5B8b660B",
+      "liveCodehash": "0x6902228af3c24291946d384f835e482cded0552607f8f410071591db0e132524",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": false
+    },
+    "vaultCodeStore2": {
+      "address": "0xeac760E26c42181b71EA3cC98a871832A51c8e74",
+      "liveCodehash": "0x612185e399b14bd2011ac0d1f45ae32c12729cd165146648fc75a58818a17086",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": false
+    },
+    "MLDSA44Verifier": {
+      "address": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c",
+      "liveCodehash": "0x00221a5ca716f915d6209797adf624ecf15d3e6966427c40f02b9a7047c00865",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    },
+    "F1600Helper": {
+      "address": "0xEB38AaA050e8ce2d0E56d735c607b9496af9F003",
+      "liveCodehash": "0x4afb4435879cdf8e50474c7aab2bc3a679caed432550ad6dba64f509309a817b",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": false
+    },
+    "smokeVault": {
+      "address": "0x3D579C3B61fA81BA35Bd190696533d6e44cE2683",
+      "liveCodehash": "0x7089098a5e3746cb4cbd152eecd8389543c6f6f09907fc78a56cff6d3704551a",
+      "admin": null,
+      "upgradeable": false,
+      "sourceVerified": true
+    }
+  },
+  "source": {
+    "files": {
+      "contracts/src/v2/KeyFactoryV2.sol": "e47034f61e8569c3ed14e7eeb4d6060c09612d0dbc23fe67278141ecd3db4e2b",
+      "contracts/src/v2/PersonalVaultV2.sol": "d13bf3d20a3718a93f75e18babd600f003fd8119bd105e7f0b32c2c2732bdb34",
+      "contracts/src/v2/QuanletV2.sol": "0162f385d203b58a6ad1e1f526628a87b586b66b3d79334e4c16021a50245f90",
+      "contracts/src/v2/VaultFactoryV2.sol": "341908926ce302d06fc40d9d26e66d297f057233a6e620a6d4ec4e9c3f4140ab"
+    }
+  },
+  "verifier": {
+    "files": {
+      "contracts/src/verifier/Decode.sol": "62800c6dc97625581add1aaae8650f344fd1f165f7ac53d2632dc5c995758a9f",
+      "contracts/src/verifier/FastKeccak170.sol": "a0b8b0c01542264b192b3697f5e2d078dd173506b89fd824df32707e6ee2c3cd",
+      "contracts/src/verifier/IMLDSAVerifier.sol": "de2461a26d1ed4306a6888e998d06c725960f6556a945516e9d93f7564fcf379",
+      "contracts/src/verifier/InvNtt.sol": "b097bdd5a4881559abe91303239b3f12e1a2a74be48894b7134efc48be0a125c",
+      "contracts/src/verifier/MLDSA44Verifier.sol": "e73fbc14792d8a48869476e54ad58cae2b78dab0930a9f0bda0aa1363db7176e",
+      "contracts/src/verifier/Ntt.sol": "87b2d1b4d88312b40694163c0656e5435d06221a18625cce65dbcf1f9674795f"
+    },
+    "vendoredFrom": "Fireblocks Labs ML-DSA-44 verifier (MIT)",
+    "helper": {
+      "file": "contracts/helpers/f1600_170.hex",
+      "sha256": "f26320c4be54bdf71270d0ca92a6cf665966f0a320b84676aa75d5fa3dc612c4"
+    }
+  },
+  "client": {
+    "files": {
+      "apps/web/src/testnet/v2/chain.ts": "4800bce91530fd8369524f5d3044cd4cc8c4d8fa40f89a7182dfcf9342c9ff76",
+      "apps/web/src/testnet/v2/keyfile.ts": "636c84785737f40a32f05e084b42d7e084458beb95389ccad85937c5d7e0292b",
+      "apps/web/src/testnet/v2/profile.ts": "4f8f401555125bb284a8909fd3480e3d06d1300dee24ed11ec855ca35558a2e5",
+      "cli/lib/io.mjs": "5ca2be3a00941fb22775749370ea4d72ea0b50a48433c67dcad9af30b6710de7",
+      "cli/lib/keyfile.mjs": "751d4962c1c8d80a9b59fa13b8d730b2e85957cca990349c36a9a2bf45a18259",
+      "cli/lib/keyfile2.mjs": "fddda3c1f0b2c60204bf536547a9ce2ad0bb1921c08f7396e692ecba904f6d9b",
+      "cli/lib/prepare.mjs": "6d2dbd125cefe4c285f016f564cdf378bfe9a021b9b8f1e97fecb6c072f0e28c",
+      "cli/lib/protocol.mjs": "eb9dc7e7c9de346dd3557589f91c70e33eec7371d9188b66b1cc6069b27e0cff",
+      "cli/lib/protocol2.mjs": "07d9ee3ffb2c800d212a4cdb407d15e68f2903059e73efaa4e86353b5b7ef673",
+      "cli/lib/v2.mjs": "1fa1ea691250f6858f98c4c13ae6058e765a9773ab1d2b8a3ecbe7c1f313359f",
+      "cli/lib/vectors.mjs": "7672d7dc5b9bd17840b27a2819f0d84ca7b6c352257b0020ebad6838e5c4057b",
+      "cli/lib/vectors2.mjs": "593f7e262cb529e4eb6c90bbac6f5f2cf4b9c64f2162eda07bb4458ed7e923e8"
+    }
+  },
+  "evidence": {
+    "deployment": "contracts/deployments/4663.v2.json",
+    "liveSmoke": "contracts/deployments/4663.v2.gate-b.json",
+    "smoke": {
+      "fastOverAllowanceRefused": true,
+      "primaryOnlyProtectedRefused": true,
+      "vaultBalanceAfterWei": "200000000000000"
+    }
+  }
+}

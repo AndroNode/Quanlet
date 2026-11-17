@@ -138,7 +138,22 @@ export const DEFAULT_CONFIG: QuanletConfig = {
     },
     mainnet: null,
     // mainnetV2:begin (written by cli/scripts/mainnet-config.mjs from contracts/deployments/4663.v2.json)
-    mainnetV2: null,
+    mainnetV2: {
+      keyFactory: '0xC5a0Ca0adcb6d2C55146641bbc0fc0Ae3EC2E0f2',
+      verifier: '0xb968d948271dc4F0DE95E904E7f6B09AE23D780c',
+      vaultFactory: '0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d',
+      multicall: '0xcA11bde05977b3631167028862bE2a173976CA11',
+      manifestUrl: 'contracts/deployments/4663.v2.json',
+      compatibleVaultFactories: [],
+      tokens: [],
+      deployedAtBlock: 116352066,
+      f1600Helper: '0xEB38AaA050e8ce2d0E56d735c607b9496af9F003',
+      vaultCodeStores: [
+        '0xb9CE5e041f3b943E7421EbD523a4019C5B8b660B',
+        '0xeac760E26c42181b71EA3cC98a871832A51c8e74'
+      ],
+      deployedOn: '2026-11-17'
+    },
     // mainnetV2:end
   },
   assets: [{ symbol: 'ETH', address: null, decimals: 18, reviewed: true }],

@@ -133,18 +133,24 @@ on-chain verifier code (`forge test --match-contract AcvpTest`).
 `SECURITY.md` says how to report a vulnerability. `docs/RISK-NOTICE.md` is the risk notice a person acknowledges
 before their first deposit on mainnet.
 
-## Before mainnet (open)
+## Mainnet
 
-Mainnet launches directly (no beta), ETH only. `docs/MAINNET-RUNBOOK.md` has every step:
+Protocol 2.0 is live on Robinhood Chain mainnet (chain 4663) since 17 November 2026, ETH only, with no beta.
+Deployment: `contracts/deployments/4663.v2.json`; release manifest with live code hashes:
+`contracts/deployments/4663.v2.release.json`; live smoke test: `contracts/deployments/4663.v2.gate-b.json`.
 
-- **Deployer wallet**: a fresh wallet with about 0.005 ETH on Robinhood Chain, its key in a git-ignored env file.
-- **Rehearsal**: `contracts/script/rehearse-mainnet.sh` runs the whole launch on a local mainnet fork (no key,
-  nothing broadcast).
-- **Deployment**: the deploy with the explicit go-ahead phrase, source verification and the release manifest
-  (`cli/scripts/release2.mjs`).
-- **Smoke test on mainnet**: a tiny vault with one FAST and one protected transfer and two refusals.
-- **Site switch**: `cli/scripts/mainnet-config.mjs` writes `mainnetV2` into `packages/config`,
-  `cli/scripts/mainnet-preflight.mjs` checks it against the chain, then a mainnet build.
+| Contract | Address |
+| --- | --- |
+| VaultFactoryV2 (ETH only) | `0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d` |
+| KeyFactoryV2 | `0xC5a0Ca0adcb6d2C55146641bbc0fc0Ae3EC2E0f2` |
+| ML-DSA-44 verifier | `0xb968d948271dc4F0DE95E904E7f6B09AE23D780c` |
+| F1600 helper | `0xEB38AaA050e8ce2d0E56d735c607b9496af9F003` |
+| Vault code stores | `0xb9CE5e041f3b943E7421EbD523a4019C5B8b660B`, `0xeac760E26c42181b71EA3cC98a871832A51c8e74` |
+
+Source is verified through Sourcify. `docs/MAINNET-RUNBOOK.md` records every launch step;
+`node cli/scripts/mainnet-preflight.mjs` re-checks the chain, the manifest, the local build and the site config at
+any time (read-only). Some mainnet addresses equal testnet ones because the same wallet deployed both at the same
+nonces; the chains are separate.
 
 ## Licences
 

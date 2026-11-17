@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PageHead } from '../components/ui';
+import { IS_MAINNET } from '../net';
 
 const STEPS: Array<{ title: string; body: string; where: string; link: [string, string] }> = [
   {
@@ -80,7 +81,7 @@ export default function HowItWorks() {
           <div className="card flat">
             <h3>Where it runs</h3>
             <p className="small">
-              Key records, the vault, its policy, allowances and timers live on Robinhood Chain, and ML-DSA-44 signatures are verified by a contract. Your keys are made and kept on your devices. Quanlet runs on Robinhood Chain testnet today, where ETH has no value; mainnet follows the testnet.
+              Key records, the vault, its policy, allowances and timers live on Robinhood Chain, and ML-DSA-44 signatures are verified by a contract. Your keys are made and kept on your devices. {IS_MAINNET ? 'Quanlet runs on Robinhood Chain mainnet, for ETH only.' : 'Quanlet runs on Robinhood Chain testnet today, where ETH has no value; mainnet follows the testnet.'}
             </p>
           </div>
         </div>

@@ -1,0 +1,20 @@
+{
+  "chainId": 4663,
+  "dependencyManifestHash": "0xe22db4f2d2ebccc77a8abc35d94f0f3272d4e6aba0c048c72dbe1272c723710e",
+  "deployedAtBlock": 116352066,
+  "f1600Helper": "0xEB38AaA050e8ce2d0E56d735c607b9496af9F003",
+  "keyFactoryV2": "0xC5a0Ca0adcb6d2C55146641bbc0fc0Ae3EC2E0f2",
+  "keyFactoryV2Codehash": "0x8860be63300264b8dddda122e403987486378c514da274cb3ab68ae84193edc3",
+  "protocolVersion": 2,
+  "supportedAssets": [
+    "0x0000000000000000000000000000000000000000"
+  ],
+  "vaultCodeStores": [
+    "0xb9CE5e041f3b943E7421EbD523a4019C5B8b660B",
+    "0xeac760E26c42181b71EA3cC98a871832A51c8e74"
+  ],
+  "vaultCreationCodeHash": "0xea0432ad261fc8ad7e2a32c2223513cc7bfcd407c16e21f01b1cb25716d2a59f",
+  "vaultFactoryV2": "0x68335F07BC58F1057b59bBFb378e804eFaC7Db0d",
+  "verifier": "0xb968d948271dc4F0DE95E904E7f6B09AE23D780c",
+  "verifierCodehash": "0x00221a5ca716f915d6209797adf624ecf15d3e6966427c40f02b9a7047c00865"
+}
