@@ -72,13 +72,19 @@ const FAQ: Array<[string, string]> = [
   ['What happens if this website goes down?', 'Your vault keeps working. It is a contract on chain with no owner, and any wallet can submit your signed requests to it directly, without this site.'],
 ];
 
-const CAPTIONS = ['Post-quantum vault', 'Dual ML-DSA-44 keys', 'Gas-separated authority', 'Finite FAST allowance', '2-of-3 guardian recovery'];
+/** The hero's two side rails: who holds a key, and how funds can leave. Facts from contracts/src/v2. */
+const HERO_KEYS: Array<[string[], string, string]> = [
+  [['P'], 'Primary', 'Starts every payment'],
+  [['A'], 'Approver', 'Co-signs protected payments and every change'],
+  [['G1', 'G2', 'G3'], 'Guardians', 'Any two restore access'],
+];
+const HERO_ROUTES: Array<[string, string, string]> = [
+  ['FAST', 'Primary alone, to listed recipients, inside an allowance', 'At once'],
+  ['Protected', 'Primary and approver, any amount', '0 to 72 h'],
+  ['Recovery', 'Two guardians replace both spending keys', '7 days'],
+];
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
-
-function Mark({ size = 22 }: { size?: number }) {
-  return <img src="/brand/quanlet-mark-small-on-dark.svg" alt="" width={size} height={size} className="hm-mark" />;
-}
 
 /** 64 hex characters that never sit still: a stand-in for a private key (decorative, random each frame). */
 function KeyScramble() {
@@ -446,6 +452,42 @@ export default function Home() {
             <span>asset protection</span>
           </span>
         </h1>
+        <div className="hero3-rails">
+          <section className="hero3-rail l" aria-labelledby="hr-keys">
+            <h2 id="hr-keys">Five keys, one vault</h2>
+            <ul>
+              {HERO_KEYS.map(([ids, name, what]) => (
+                <li key={name}>
+                  <span className="hr-ids">
+                    {ids.map((k) => (
+                      <span className="hr-id" key={k}>
+                        {k}
+                      </span>
+                    ))}
+                  </span>
+                  <span className="hr-txt">
+                    <b>{name}</b>
+                    <small>{what}</small>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className="hero3-rail r" aria-labelledby="hr-routes">
+            <h2 id="hr-routes">Three ways funds move</h2>
+            <ul>
+              {HERO_ROUTES.map(([name, who, when]) => (
+                <li key={name}>
+                  <span className="hr-txt">
+                    <b>{name}</b>
+                    <small>{who}</small>
+                  </span>
+                  <span className="hr-when">{when}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
         <div className="hero3-foot">
           <p className="hero3-lede">
             Quanlet is a self-custody vault on Robinhood Chain. Funds inside it move only with lattice-based signatures from keys you hold, and three guardians can restore access if
@@ -464,19 +506,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <div className="ribbon" aria-hidden>
-        <div className="ribbon-track">
-          {[0, 1].map((r) =>
-            CAPTIONS.map((c) => (
-              <span className="ribbon-item" key={`${r}-${c}`}>
-                {c}
-                <Mark size={26} />
-              </span>
-            )),
-          )}
-        </div>
-      </div>
 
       {/* ---------------------------------------------------------------- act 1: one key */}
       <section className="act act1" id="problem" data-act data-cuts="0.36,0.68" data-track="-0.16:0,0.1:1,0.66:1,0.8:2" style={{ '--len': 3.8 } as CSSProperties} aria-labelledby="a1-h">
