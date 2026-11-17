@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useUi } from '../store';
-import { webglAvailable } from '../home3d/webgl';
+import { canRun3D, frames, loadStageModule, type LoadState } from '../home3d/loader';
+import { LatticeLoader } from '../home3d/LatticeLoader';
 import type { Stage } from '../home3d/stage';
 import '../home3d/home.css';
 
@@ -153,8 +154,19 @@ export default function Home() {
   const stage = useRef<Stage | null>(null);
   const track = useRef<HTMLDivElement>(null);
   const motion = useUi((s) => s.motion);
-  const [has3d] = useState(() => webglAvailable());
+  // 3D only with WebGL 2 on a real GPU (?3d=force skips the speed check); otherwise the 2D crystal stays.
+  const [can3d] = useState(() => canRun3D(new URLSearchParams(window.location.search).get('3d') === 'force'));
+  const [view, setView] = useState<'loading' | 'live' | 'fallback'>(can3d ? 'loading' : 'fallback');
+  const load = useRef<LoadState>({ p: 0, phase: 'fetch', fetched: 0, points: 0 });
+  const clock = useRef(0);
+  const reducedNow = () => matchMedia('(prefers-reduced-motion: reduce)').matches || useUi.getState().motion === 'off';
   const [ready, setReady] = useState(false);
+  const [loaderGone, setLoaderGone] = useState(false);
+  useEffect(() => {
+    if (view !== 'live') return;
+    const t = window.setTimeout(() => setLoaderGone(true), 1200);
+    return () => clearTimeout(t);
+  }, [view]);
 
   // ------------------------------------------------------------------ scroll engine
   const pts = useRef<Array<[number, number]>>([[0, 0]]);
@@ -266,15 +278,40 @@ export default function Home() {
   }, []);
 
   // ------------------------------------------------------------------ 3D stage (loaded after first paint)
+  // The 2D loader shows real progress while the stage downloads, builds its points and compiles its shaders;
+  // the page crossfades to the stage once it has rendered (see LatticeLoader). Any failure keeps the 2D view.
   useEffect(() => {
-    if (!has3d || !canvas.current) return;
+    if (!can3d || !canvas.current) return;
     let alive = true;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches || useUi.getState().motion === 'off';
-    import('../home3d/stage')
-      .then(({ Stage }) => {
+    const st0 = load.current;
+    const giveUp = () => {
+      if (!alive) return;
+      stage.current?.dispose();
+      stage.current = null;
+      st0.phase = 'fallback';
+      setView('fallback');
+    };
+    loadStageModule(st0)
+      .then(async ({ Stage }) => {
         if (!alive || !canvas.current) return;
-        const st = new Stage(canvas.current, { reduced, target: () => target.current() });
+        st0.phase = 'build';
+        st0.points = Math.min(window.innerWidth, window.innerHeight) < 700 || (navigator.hardwareConcurrency || 8) <= 4 ? 5600 : 9800;
+        st0.p = Math.max(st0.p, 0.86);
+        await frames(2);
+        if (!alive || !canvas.current) return;
+        const st = new Stage(canvas.current, {
+          reduced: reducedNow(),
+          target: () => target.current(),
+          startTime: clock.current,
+          onReady: () => {
+            st0.phase = 'ready';
+            st0.p = 1;
+          },
+          onFail: giveUp,
+        });
         stage.current = st;
+        st0.phase = 'compile';
+        st0.p = Math.max(st0.p, 0.93);
         const f = st.formations.anchors;
         const an = anchors.current!;
         const q = (k: string) => an.querySelector<HTMLElement>(`[data-k="${k}"]`)!;
@@ -287,23 +324,25 @@ export default function Home() {
           { el: q('meter'), state: 4, pos: f.fastEnd },
           { el: q('dial'), state: 4, pos: f.safeEnd },
         ]);
-        root.current?.classList.add('has3d');
       })
-      .catch(() => root.current?.classList.add('no3d'));
+      .catch(giveUp);
     return () => {
       alive = false;
       stage.current?.dispose();
       stage.current = null;
     };
-  }, [has3d]);
+  }, [can3d]);
 
   useEffect(() => {
     stage.current?.setReduced(motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches);
   }, [motion]);
 
   return (
-    <div className={`h3d${ready ? ' ready' : ''}${has3d ? '' : ' no3d'}`} ref={root}>
-      <canvas className="h3d-canvas" ref={canvas} aria-hidden />
+    <div className={`h3d${ready ? ' ready' : ''}${view === 'live' ? ' has3d' : view === 'fallback' ? ' no3d' : ' loading3d'}`} ref={root}>
+      {can3d && <canvas className="h3d-canvas" ref={canvas} aria-hidden />}
+      {view !== 'live' || !loaderGone ? (
+        <LatticeLoader state={load} mode={view === 'fallback' ? 'fallback' : 'loading'} reduced={reducedNow()} clock={clock} onSettled={() => setView('live')} />
+      ) : null}
 
       {/* labels that ride on the 3D formations */}
       <div className="h3d-anchors" ref={anchors} aria-hidden>
@@ -397,7 +436,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <img className="hero3-fallback" src="/brand/quanlet-mark-on-dark.svg" alt="" aria-hidden />
       </section>
 
       <div className="ribbon" aria-hidden>

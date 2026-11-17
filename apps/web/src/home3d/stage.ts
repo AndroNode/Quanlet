@@ -174,6 +174,12 @@ export interface StageOptions {
   target: () => number;
   /** Per-frame hook for page-side effects (state value and weights). */
   onFrame?: (s: number) => void;
+  /** Start from this scene time (seconds) and skip the opening gather: the 2D loader already drew it. */
+  startTime?: number;
+  /** The first frames rendered with compiled shaders. */
+  onReady?: () => void;
+  /** The scene cannot be shown: a shader failed to compile, or the GPU context was lost and not given back. */
+  onFail?: (why: string) => void;
 }
 
 export class Stage {
@@ -207,6 +213,10 @@ export class Stage {
   private ray = new THREE.Raycaster();
   private plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
   private disposed = false;
+  private failed = false;
+  private framesOk = 0;
+  private readySent = false;
+  private lostTimer = 0;
   private u = {
     uMix: { value: 0 },
     uTime: { value: 0 },
@@ -247,6 +257,13 @@ export class Stage {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 1.75));
     this.renderer.setClearColor(0x000000, 0);
+    // A shader that does not compile on this GPU would otherwise leave a silent, empty canvas.
+    this.renderer.debug.onShaderError = (gl, program) => {
+      console.warn('Quanlet 3D: shader failed', gl.getProgramInfoLog(program));
+      this.fail('shader');
+    };
+    canvas.addEventListener('webglcontextlost', this.onLost);
+    canvas.addEventListener('webglcontextrestored', this.onRestored);
     // No filmic tone mapping: it pushes the brand violet (#8902FE) toward pink at high intensity.
     this.renderer.toneMapping = THREE.NoToneMapping;
 
@@ -311,7 +328,8 @@ export class Stage {
     this.streak.visible = false;
     this.scene.add(this.streak);
 
-    if (opts.reduced) this.intro = 1;
+    if (opts.reduced || opts.startTime !== undefined) this.intro = 1;
+    this.time = opts.startTime ?? 0;
     this.s = opts.target();
     this.resize();
     window.addEventListener('pointermove', this.onPointer, { passive: true });
@@ -382,8 +400,25 @@ export class Stage {
     return (k.base ?? 0) + k.speed * t + k.sway * Math.sin(t * 0.42);
   }
 
+  private fail(why: string) {
+    if (this.failed || this.disposed) return;
+    this.failed = true;
+    cancelAnimationFrame(this.raf);
+    this.opts.onFail?.(why);
+  }
+
+  // The browser may take the GPU context away (memory pressure, a driver reset). three.js restores it when it is
+  // given back; if it is not given back soon, the page falls back to the 2D view.
+  private onLost = () => {
+    clearTimeout(this.lostTimer);
+    this.lostTimer = window.setTimeout(() => this.fail('context lost'), 4000);
+  };
+  private onRestored = () => {
+    clearTimeout(this.lostTimer);
+  };
+
   private loop = () => {
-    if (this.disposed) return;
+    if (this.disposed || this.failed) return;
     this.raf = requestAnimationFrame(this.loop);
     const dt = Math.min(0.05, this.clock.getDelta());
     const reduced = this.opts.reduced;
@@ -498,6 +533,10 @@ export class Stage {
     u.uImpactAge.value = im.age;
 
     this.renderer.render(this.scene, this.camera);
+    if (!this.readySent && !this.failed && !this.renderer.getContext().isContextLost() && (this.framesOk += 1) >= 3) {
+      this.readySent = true;
+      this.opts.onReady?.();
+    }
     this.placeAnchors();
     this.opts.onFrame?.(this.s);
   };
@@ -529,6 +568,9 @@ export class Stage {
   dispose() {
     this.disposed = true;
     cancelAnimationFrame(this.raf);
+    clearTimeout(this.lostTimer);
+    this.canvas.removeEventListener('webglcontextlost', this.onLost);
+    this.canvas.removeEventListener('webglcontextrestored', this.onRestored);
     window.removeEventListener('pointermove', this.onPointer);
     document.removeEventListener('visibilitychange', this.onVis);
     this.geo.dispose();

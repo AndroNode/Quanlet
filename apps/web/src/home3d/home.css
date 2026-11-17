@@ -81,8 +81,6 @@ html:has(.h3d) .header.scrolled { background: rgba(0, 0, 0, .7); border-bottom-c
 .hero3-lede { margin: 0; font-size: var(--fs-lead); line-height: 1.55; color: var(--q-text-2); text-shadow: 0 0 18px #000; }
 .hero3-cta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 .hero3-status { flex-basis: 100%; margin: 6px 0 0; text-align: right; font-size: .84rem; color: var(--q-text-2); display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
-.hero3-fallback { display: none; }
-.no3d .hero3-fallback { display: block; position: absolute; left: 50%; top: 50%; width: min(36vw, 280px); transform: translate(-50%, -50%); filter: drop-shadow(0 0 60px rgba(137, 2, 254, .6)); z-index: 1; }
 
 /* ------------------------------------------------------------------ ribbon: the brand film's five captions */
 .ribbon { position: relative; z-index: 2; overflow: hidden; padding: clamp(14px, 2.4vh, 24px) 0; border-block: 1px solid var(--q-line); background: rgba(0, 0, 0, .62); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
@@ -224,3 +222,18 @@ html:has(.h3d) .header.scrolled { background: rgba(0, 0, 0, .7); border-bottom-c
   .st, .hero3-title .l1 > span, .hero3-title .l2 > span, .hero3-foot { transition: none; }
 }
 [data-motion="off"] .ribbon-track { animation: none; }
+
+/* ------------------------------------------------------------------ 3D loader and 2D view (LatticeLoader) */
+/* The WebGL canvas stays hidden until its first frames are on screen; then it crossfades in over the loader. */
+.h3d-canvas { opacity: 0; transition: opacity .9s var(--q-ease); }
+.has3d .h3d-canvas { opacity: 1; }
+.h3d-loader { position: fixed; inset: 0; z-index: 1; pointer-events: none; --sf: 1; transition: opacity .9s var(--q-ease); animation: h3d-loader-in .5s var(--q-ease) both; }
+.has3d .h3d-loader { opacity: 0; }
+.h3d-loader canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: var(--sf); }
+.h3d-loader-label { position: absolute; left: 50%; top: 0; margin: 0; white-space: nowrap; font-size: .82rem; letter-spacing: .01em; color: rgba(214, 196, 255, .78);
+  font-variant-numeric: tabular-nums; text-shadow: 0 0 12px #000, 0 0 3px #000; opacity: var(--sf); transition: color .3s var(--q-ease); }
+/* the 2D view's note shows for a few seconds, then leaves the crystal alone */
+.h3d-loader.is-fallback .h3d-loader-label { animation: h3d-note 7s var(--q-ease) both; }
+@keyframes h3d-loader-in { from { opacity: 0; } }
+@keyframes h3d-note { 0%, 80% { opacity: var(--sf); } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .h3d-loader, .h3d-canvas { transition-duration: .2s; } .h3d-loader { animation: none; } }
