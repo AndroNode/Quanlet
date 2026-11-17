@@ -99,10 +99,11 @@ html:has(.h3d) .header.scrolled { background: rgba(0, 0, 0, .7); border-bottom-c
 .acts-ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; align-content: end; }
 .acts-ticks li { width: 2px; height: 20px; background: var(--q-line-strong); transition: background .4s, height .45s var(--q-ease), box-shadow .4s; }
 .acts-stack { display: grid; }
-.st { grid-area: 1 / 1; opacity: 0; transform: translateY(18px); filter: blur(6px); transition: opacity .55s var(--q-ease), transform .8s var(--q-ease), filter .55s var(--q-ease); }
+/* No blur on hidden steps: a dozen resting blur layers cost Safari GPU memory the 3D scene needs. */
+.st { grid-area: 1 / 1; opacity: 0; transform: translateY(18px); transition: opacity .55s var(--q-ease), transform .8s var(--q-ease); }
 .st p { margin: 0; max-width: 36ch; font-size: var(--fs-step); line-height: 1.5; color: var(--q-text); text-shadow: 0 0 22px #000, 0 0 2px #000; }
 .st strong { font-weight: 600; color: #fff; }
-.act[data-step="0"] .st[data-i="0"], .act[data-step="1"] .st[data-i="1"], .act[data-step="2"] .st[data-i="2"], .act[data-step="3"] .st[data-i="3"] { opacity: 1; transform: none; filter: none; }
+.act[data-step="0"] .st[data-i="0"], .act[data-step="1"] .st[data-i="1"], .act[data-step="2"] .st[data-i="2"], .act[data-step="3"] .st[data-i="3"] { opacity: 1; transform: none; }
 .act[data-step="0"] .acts-ticks li[data-i="0"], .act[data-step="1"] .acts-ticks li[data-i="1"], .act[data-step="2"] .acts-ticks li[data-i="2"], .act[data-step="3"] .acts-ticks li[data-i="3"] { background: var(--q-violet); height: 36px; box-shadow: 0 0 12px var(--q-glow); }
 
 /* act 1: heading top-left, story bottom-left, the key's secret bottom-right */
@@ -224,16 +225,56 @@ html:has(.h3d) .header.scrolled { background: rgba(0, 0, 0, .7); border-bottom-c
 [data-motion="off"] .ribbon-track { animation: none; }
 
 /* ------------------------------------------------------------------ 3D loader and 2D view (LatticeLoader) */
-/* The WebGL canvas stays hidden until its first frames are on screen; then it crossfades in over the loader. */
+/* The WebGL canvas stays hidden until its first frames are on screen; then it shows under the loader. */
 .h3d-canvas { opacity: 0; transition: opacity .9s var(--q-ease); }
 .has3d .h3d-canvas { opacity: 1; }
-.h3d-loader { position: fixed; inset: 0; z-index: 1; pointer-events: none; --sf: 1; transition: opacity .9s var(--q-ease); animation: h3d-loader-in .5s var(--q-ease) both; }
-.has3d .h3d-loader { opacity: 0; }
-.h3d-loader canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: var(--sf); }
+.h3d-loader { position: fixed; inset: 0; z-index: 1; pointer-events: none; --sf: 1; transition: opacity .9s var(--q-ease); }
+.h3d-loader:not(.has-intro) { animation: h3d-loader-in .5s var(--q-ease) both; }
+.h3d-loader.is-out { opacity: 0; }
+.h3d-loader > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: var(--sf); }
 .h3d-loader-label { position: absolute; left: 50%; top: 0; margin: 0; white-space: nowrap; font-size: .82rem; letter-spacing: .01em; color: rgba(214, 196, 255, .78);
-  font-variant-numeric: tabular-nums; text-shadow: 0 0 12px #000, 0 0 3px #000; opacity: var(--sf); transition: color .3s var(--q-ease); }
-/* the 2D view's note shows for a few seconds, then leaves the crystal alone */
+  font-variant-numeric: tabular-nums; text-shadow: 0 0 12px #000, 0 0 3px #000; opacity: var(--sf); }
 .h3d-loader.is-fallback .h3d-loader-label { animation: h3d-note 7s var(--q-ease) both; }
 @keyframes h3d-loader-in { from { opacity: 0; } }
 @keyframes h3d-note { 0%, 80% { opacity: var(--sf); } 100% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .h3d-loader, .h3d-canvas { transition-duration: .2s; } .h3d-loader { animation: none; } }
+
+/* the opening: above everything until it opens onto the page */
+.h3d-loader.has-intro:not(.is-open) { z-index: 60; pointer-events: auto; }
+.ldr-veil { position: absolute; inset: 0; background: #000; }
+.h3d-loader.is-open .ldr-veil { display: none; }
+.ldr-chrome { position: absolute; inset: 0; transition: opacity .35s var(--q-ease), transform .5s var(--q-ease); }
+.is-closing .ldr-chrome { opacity: 0; transform: translateY(8px); }
+
+.ldr-steps { position: absolute; left: var(--gutter); bottom: clamp(44px, 7vh, 72px); margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.ldr-steps li { display: grid; grid-template-columns: 22px auto; column-gap: 12px; align-items: baseline; font-size: .92rem; line-height: 1.3;
+  color: var(--q-echo); transition: color .4s var(--q-ease); }
+.ldr-n { font-size: .74rem; color: inherit; font-variant-numeric: tabular-nums; position: relative; }
+.ldr-t { font-weight: 500; letter-spacing: -.01em; }
+.ldr-v { grid-column: 2; font-size: .8rem; color: var(--q-text-2); font-variant-numeric: tabular-nums; min-height: 0; }
+.ldr-v:empty { display: none; }
+.ldr-steps li[data-s="now"] { color: var(--q-text); }
+.ldr-steps li[data-s="now"] .ldr-n::before { content: ""; position: absolute; left: -12px; top: 50%; width: 5px; height: 5px; margin-top: -2px; border-radius: 50%;
+  background: var(--q-accent); box-shadow: 0 0 10px var(--q-violet); animation: ldr-pulse 1.1s ease-in-out infinite; }
+.ldr-steps li[data-s="done"] { color: var(--q-text-2); }
+.ldr-steps li[data-s="done"] .ldr-v { display: none; }
+
+.ldr-count { position: absolute; right: var(--gutter); bottom: clamp(36px, 6vh, 60px); margin: 0; display: flex; align-items: flex-start; line-height: .8;
+  font-weight: 300; letter-spacing: -.06em; color: var(--q-text); font-variant-numeric: tabular-nums; }
+.ldr-num { font-size: clamp(4.2rem, 12vw, 10.5rem); }
+.ldr-pct { font-size: clamp(1.1rem, 2.2vw, 1.9rem); margin: .1em 0 0 .25em; color: var(--q-accent); letter-spacing: 0; font-weight: 400; }
+.ldr-rule { position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(20px, 3.4vh, 32px); height: 1px; background: rgba(201, 163, 255, .14); overflow: hidden; }
+.ldr-rule i { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(137, 2, 254, .6), var(--q-accent) 70%, #fff); transform-origin: 0 50%; transform: scaleX(0); }
+.ldr-skip { position: absolute; left: 50%; bottom: clamp(36px, 6vh, 60px); transform: translate(-50%, 6px); border: 0; padding: 8px 4px; background: none;
+  color: var(--q-text-2); font: inherit; font-size: .84rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(201, 163, 255, .35);
+  opacity: 0; pointer-events: none; transition: opacity .5s var(--q-ease), transform .5s var(--q-ease), color .2s; cursor: pointer; }
+.ldr-skip.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+.ldr-skip:hover { color: var(--q-text); }
+.ldr-skip:focus-visible { outline: 2px solid var(--q-accent); outline-offset: 2px; }
+@keyframes ldr-pulse { 50% { opacity: .35; } }
+@media (max-width: 640px) {
+  .ldr-steps { bottom: clamp(108px, 15vh, 140px); gap: 7px; }
+  .ldr-steps li { font-size: .84rem; }
+  .ldr-skip { bottom: clamp(56px, 8vh, 72px); }
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (prefers-reduced-motion: reduce) { .h3d-loader, .h3d-canvas { transition-duration: .2s; } .h3d-loader { animation: none; } .ldr-steps li[data-s="now"] .ldr-n::before { animation: none; } }

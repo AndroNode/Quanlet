@@ -20,7 +20,14 @@ export interface LoadState {
   fetched: number;
   /** Points the stage builds (shown while building). */
   points: number;
+  /** Bytes received and expected (0 when unknown). */
+  got: number;
+  total: number;
+  /** The latest bytes of the stage code as they arrive: the loader draws them. */
+  tail: Uint8Array;
 }
+
+export const newLoadState = (): LoadState => ({ p: 0, phase: 'fetch', fetched: 0, points: 0, got: 0, total: 0, tail: new Uint8Array(0) });
 
 export const FETCH_SHARE = 0.82;
 
@@ -39,7 +46,7 @@ function manifest(): Manifest | null {
 class Stalled extends Error {}
 
 /** Downloads every file of the stage chunk, reporting decoded bytes. Aborts if nothing arrives for `stallMs`. */
-async function download(m: Manifest, onBytes: (n: number) => void, stallMs: number) {
+async function download(m: Manifest, onBytes: (n: number, chunk: Uint8Array) => void, stallMs: number) {
   const ctrl = new AbortController();
   let last = performance.now();
   const watch = window.setInterval(() => {
@@ -57,7 +64,7 @@ async function download(m: Manifest, onBytes: (n: number) => void, stallMs: numb
           if (done) break;
           last = performance.now();
           total += value.byteLength;
-          onBytes(total);
+          onBytes(total, value);
         }
       }),
     );
@@ -90,9 +97,18 @@ export async function loadStageModule(st: LoadState, stallMs = 12000): Promise<t
       st.p = Math.max(st.p, FETCH_SHARE);
     }
   }
+  st.total = m.bytes;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      await download(m, (n) => setFetched(n / m.bytes), stallMs);
+      await download(
+        m,
+        (n, chunk) => {
+          st.got = Math.min(n, m.bytes);
+          st.tail = chunk.length > 4096 ? chunk.subarray(chunk.length - 4096) : chunk;
+          setFetched(n / m.bytes);
+        },
+        stallMs,
+      );
       setFetched(1);
       return await import('./stage');
     } catch (e) {

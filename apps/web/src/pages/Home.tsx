@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useUi } from '../store';
-import { canRun3D, frames, loadStageModule, type LoadState } from '../home3d/loader';
+import { canRun3D, frames, loadStageModule, newLoadState, type LoadState } from '../home3d/loader';
 import { LatticeLoader } from '../home3d/LatticeLoader';
 import type { Stage } from '../home3d/stage';
 import '../home3d/home.css';
@@ -157,16 +157,26 @@ export default function Home() {
   // 3D only with WebGL 2 on a real GPU (?3d=force skips the speed check); otherwise the 2D crystal stays.
   const [can3d] = useState(() => canRun3D(new URLSearchParams(window.location.search).get('3d') === 'force'));
   const [view, setView] = useState<'loading' | 'live' | 'fallback'>(can3d ? 'loading' : 'fallback');
-  const load = useRef<LoadState>({ p: 0, phase: 'fetch', fetched: 0, points: 0 });
+  const load = useRef<LoadState>(newLoadState());
+  // The full-screen opening plays on the first visit in a session; later visits assemble in place.
+  const [intro] = useState(() => {
+    if (!can3d) return false;
+    try {
+      return !sessionStorage.getItem('quanlet.intro');
+    } catch {
+      return true;
+    }
+  });
+  const [introDone, setIntroDone] = useState(!intro);
   const clock = useRef(0);
   const reducedNow = () => matchMedia('(prefers-reduced-motion: reduce)').matches || useUi.getState().motion === 'off';
   const [ready, setReady] = useState(false);
   const [loaderGone, setLoaderGone] = useState(false);
   useEffect(() => {
-    if (view !== 'live') return;
+    if (view !== 'live' || !introDone) return;
     const t = window.setTimeout(() => setLoaderGone(true), 1200);
     return () => clearTimeout(t);
-  }, [view]);
+  }, [view, introDone]);
 
   // ------------------------------------------------------------------ scroll engine
   const pts = useRef<Array<[number, number]>>([[0, 0]]);
@@ -267,7 +277,8 @@ export default function Home() {
     document.fonts?.ready.then(measure);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
-    const t = requestAnimationFrame(() => setReady(true));
+    // With the opening, the hero title rises when the veil opens (see onExited below).
+    const t = requestAnimationFrame(() => !intro && setReady(true));
     return () => {
       cancelAnimationFrame(t);
       cancelAnimationFrame(raf);
@@ -341,7 +352,23 @@ export default function Home() {
     <div className={`h3d${ready ? ' ready' : ''}${view === 'live' ? ' has3d' : view === 'fallback' ? ' no3d' : ' loading3d'}`} ref={root}>
       {can3d && <canvas className="h3d-canvas" ref={canvas} aria-hidden />}
       {view !== 'live' || !loaderGone ? (
-        <LatticeLoader state={load} mode={view === 'fallback' ? 'fallback' : 'loading'} reduced={reducedNow()} clock={clock} onSettled={() => setView('live')} />
+        <LatticeLoader
+          state={load}
+          mode={view === 'fallback' ? 'fallback' : 'loading'}
+          reduced={reducedNow()}
+          clock={clock}
+          intro={intro}
+          onSettled={() => setView('live')}
+          onExited={() => {
+            try {
+              sessionStorage.setItem('quanlet.intro', '1');
+            } catch {
+              /* storage blocked: the opening may play again next time */
+            }
+            setIntroDone(true);
+            setReady(true);
+          }}
+        />
       ) : null}
 
       {/* labels that ride on the 3D formations */}

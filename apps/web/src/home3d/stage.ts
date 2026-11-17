@@ -143,7 +143,10 @@ void main() {
   a *= a;
   vec3 col = mix(uColA, uColB, vHue * vHue);
   col = mix(col, vec3(1.0, 0.96, 1.0), clamp(vHot, 0.0, 1.0));
-  gl_FragColor = vec4(col * a * vAlpha * (1.0 + vHot * 1.2), 0.0);
+  vec3 o = col * a * vAlpha * (1.0 + vHot * 1.2);
+  // Premultiplied output: alpha must cover the brightest channel. Colour over zero alpha is undefined, and the
+  // macOS compositor (Safari and Chrome) drops it, which left the canvas empty on Macs.
+  gl_FragColor = vec4(o, max(o.r, max(o.g, o.b)));
 }
 `;
 
@@ -280,12 +283,13 @@ export class Stage {
     this.geo.setAttribute('aGroup', new THREE.BufferAttribute(f.group, 1));
     this.geo.setAttribute('aMark', new THREE.BufferAttribute(f.mark, 1));
     this.geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 30);
-    const preserveAlpha = {
+    // Additive light on a transparent canvas, kept valid premultiplied alpha: colour and alpha both accumulate.
+    const additive = {
       blending: THREE.CustomBlending,
       blendEquation: THREE.AddEquation,
       blendSrc: THREE.OneFactor,
       blendDst: THREE.OneFactor,
-      blendSrcAlpha: THREE.ZeroFactor,
+      blendSrcAlpha: THREE.OneFactor,
       blendDstAlpha: THREE.OneFactor,
     } as const;
     this.mat = new THREE.ShaderMaterial({
@@ -293,7 +297,7 @@ export class Stage {
       fragmentShader: FRAG,
       transparent: true,
       depthWrite: false,
-      ...preserveAlpha,
+      ...additive,
       uniforms: this.u,
     });
     this.u.uPR.value = this.renderer.getPixelRatio();
@@ -316,14 +320,14 @@ export class Stage {
     const gt = new THREE.CanvasTexture(gc);
     gt.colorSpace = THREE.SRGBColorSpace;
     this.glow = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: gt, transparent: true, depthWrite: false, toneMapped: false, ...preserveAlpha, blendSrc: THREE.SrcAlphaFactor }),
+      new THREE.SpriteMaterial({ map: gt, transparent: true, depthWrite: false, toneMapped: false, ...additive, blendSrc: THREE.SrcAlphaFactor }),
     );
     this.glow.scale.set(7.5, 7.5, 1);
     this.scene.add(this.glow);
 
     // incoming strike for the shield
     const sg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
-    this.streak = new THREE.Line(sg, new THREE.LineBasicMaterial({ color: 0xf2e6ff, transparent: true, depthWrite: false, ...preserveAlpha }));
+    this.streak = new THREE.Line(sg, new THREE.LineBasicMaterial({ color: 0xf2e6ff, transparent: true, depthWrite: false, ...additive, blendSrc: THREE.SrcAlphaFactor }));
     this.streak.frustumCulled = false;
     this.streak.visible = false;
     this.scene.add(this.streak);
