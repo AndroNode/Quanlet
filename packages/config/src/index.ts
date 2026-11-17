@@ -62,7 +62,7 @@ export const ConfigSchema = z.object({
     mainnet: z
       .object({ keyFactory: address, verifier: address, vaultFactory: address, manifestUrl: z.string() })
       .nullable(),
-    /** Protocol 2.0 on Robinhood Chain mainnet: null until the reviewed contracts are deployed and checked. */
+    /** Protocol 2.0 on Robinhood Chain mainnet: null until the contracts are deployed and checked. */
     mainnetV2: z
       .object({
         keyFactory: address,

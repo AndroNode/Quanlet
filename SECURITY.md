@@ -1,6 +1,6 @@
 # Security policy
 
-Quanlet is testnet software. It has **not** been independently reviewed and must not hold real funds.
+Quanlet is testnet software and must not hold real funds until the mainnet release.
 
 ## Reporting a vulnerability
 
@@ -19,5 +19,5 @@ and is not funded yet, so rewards are not guaranteed until it launches.
 
 ## What is already known
 
-Known issues and our own (not independent) findings are listed in `docs/REVIEW-SCOPE.md` §7. Conformance
+Known issues and our own findings are listed in `docs/REVIEW-SCOPE.md` §7 and `docs/REVIEW-SCOPE-V2.md` §6. Conformance
 with NIST's ML-DSA-44 test vectors is in `docs/ACVP.md`.

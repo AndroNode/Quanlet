@@ -141,7 +141,7 @@ function NotOpen() {
           <div>
             <h1>Vaults open after deployment</h1>
             <p className="app-lede">
-              Quanlet vaults on {NET.name} open once the reviewed contracts are deployed and their code is checked against the published release. Nothing can be set up here
+              Quanlet vaults on {NET.name} open once the contracts are deployed and their code is checked against the published release. Nothing can be set up here
               yet, and this page reads no chain.
             </p>
           </div>

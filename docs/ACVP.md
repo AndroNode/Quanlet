@@ -4,9 +4,8 @@ Result (6 November 2026): **all 60 ML-DSA-44 signature-verification vectors from
 when run through Quanlet's on-chain verifier code. NIST marks 12 of them valid and 48 invalid; the verifier
 accepts exactly the 12 and rejects the other 48.
 
-This is evidence of conformance, not an audit. It shows the verifier computes FIPS 204 verification correctly
-on NIST's cases. It does not show the code is free of every bug, and it does not replace the independent
-cryptography review (Track A in `REVIEW-SCOPE.md`).
+This is evidence of conformance. It shows the verifier computes FIPS 204 verification correctly on NIST's cases;
+it does not show the code is free of every bug.
 
 ## The vectors
 

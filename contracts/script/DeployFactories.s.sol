@@ -17,7 +17,7 @@ import {VaultFactory} from "../src/VaultFactory.sol";
 /// then appended to compatibleVaultFactories: its vaults keep working and their key files stay valid.
 ///
 /// Reads DEPLOYER_PRIVATE_KEY from the environment. Rewrites deployments/<chainId>.json and keeps the
-/// replaced factory addresses as previousKeyFactory and previousVaultFactory. Refuses mainnet (4663) until an external audit clears it.
+/// replaced factory addresses as previousKeyFactory and previousVaultFactory. Protocol 1.x, testnet only: refuses mainnet (4663).
 contract DeployFactories is Script {
     function run() external {
         require(block.chainid != 4663, "mainnet gates not cleared");

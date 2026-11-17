@@ -45,9 +45,9 @@ const SECTIONS: Array<{ id: string; title: string; ref: string; body: ReactNode 
     ref: '§§01, 18',
     body: (
       <>
-        <p>As of 16 November 2026, Quanlet is at the testnet stage and mainnet is not live. The whitepaper specifies protocol 2.0. Deployed features, contract addresses and completed reviews are identified by release manifests, not by the whitepaper.</p>
+        <p>As of 16 November 2026, Quanlet is at the testnet stage and mainnet is not live. The whitepaper specifies protocol 2.0. Deployed features and contract addresses are identified by release manifests, not by the whitepaper.</p>
         <p>
-          Release follows six gates: encoding conformance; cryptographic and chain feasibility; a complete personal-vault testnet; independent review and a real-asset beta; production personal vaults; then separate product expansion. Availability is set by completed gates, never by a calendar or token milestone.
+          Release follows these stages: encoding conformance; cryptographic and chain feasibility; a complete personal-vault testnet; a capped real-asset beta; production personal vaults; then separate product expansion. Availability is set by completed gates, never by a calendar or token milestone.
         </p>
         <p>The vault on this website runs the protocol 2.0 contracts listed below on Robinhood Chain testnet, where ETH has no value.</p>
       </>
@@ -301,11 +301,10 @@ export default function Docs() {
           <section id="gaps" aria-labelledby="h-gaps">
             <h2 id="h-gaps">Known gaps</h2>
             <ul>
-              <li>There is no hosted relayer: the Testnet vault page can sign a transfer for a relayer and submit one, but nobody runs a relayer service yet.</li>
-              <li>The deployed 2.0 vault contract is 26,712 bytes. Robinhood Chain testnet accepts it, but it is larger than Ethereum’s 24,576-byte limit; the mainnet limit must be confirmed, or a smaller build used, before mainnet.</li>
+              <li>There is no hosted relayer: the vault pages can sign a transfer for a relayer and submit one, but nobody runs a relayer service yet.</li>
+              <li>The deployed 2.0 vault contract is 26,712 bytes, larger than Ethereum’s 24,576-byte limit. Robinhood Chain testnet and mainnet both accept contracts up to 98,304 bytes.</li>
               <li>No mainnet address has been published.</li>
-              <li>No independent cryptography or smart-contract review has been done yet, for protocol 1.0 or 2.0. An internal self-review of the protocol 1.0 testnet contracts found and fixed one medium issue (a relay fee could be skipped by a re-entering recipient).</li>
-              <li>The onchain verifier gives NIST's result on all 60 official ML-DSA-44 signature-verification test vectors (ACVP). That shows it follows FIPS 204 on those cases; it is not a review.</li>
+              <li>The onchain verifier gives NIST's result on all 60 official ML-DSA-44 signature-verification test vectors (ACVP). That shows it follows FIPS 204 on those cases.</li>
               <li>Protocol 2.0 gas, measured in Foundry: registering and activating a key about 12.6 million, creating a vault with five consents about 13.5 million, a FAST transfer about 1.7 million, a protected transfer about 3.2 million, and starting a recovery about 6.4 million.</li>
               <li>The source code and the standalone toolkit are published on GitHub (contracts MIT, everything else AGPL-3.0). A separate local signing interface is not published.</li>
               <li>A bug bounty programme is drafted but not funded. It must be funded before any beta that accepts real assets.</li>

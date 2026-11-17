@@ -13,8 +13,7 @@ import {VaultFactory} from "../src/VaultFactory.sol";
 ///   FOUNDRY_PROFILE=deploy forge script script/Deploy.s.sol --rpc-url robinhood_testnet --broadcast
 ///
 /// Reads DEPLOYER_PRIVATE_KEY from the environment. Writes deployments/<chainId>.json.
-/// Mainnet (4663) refuses to run unless QUANLET_MAINNET_GO=I_ACCEPT_THE_MAINNET_GATES is set,
-/// because an external audit is still an open mainnet gate.
+/// Mainnet (4663) refuses to run unless QUANLET_MAINNET_GO=I_ACCEPT_THE_MAINNET_GATES is set: an explicit go-ahead.
 contract Deploy is Script {
     uint256 constant TESTNET = 46630;
     uint256 constant MAINNET = 4663;

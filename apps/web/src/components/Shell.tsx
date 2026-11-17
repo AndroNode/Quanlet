@@ -355,7 +355,7 @@ export function Footer() {
             <span className="caps">Status</span>
             <p>
               {IS_MAINNET && !VAULTS_OPEN
-                ? `Quanlet vaults on ${NET.name} open after the reviewed contracts are deployed.`
+                ? `Quanlet vaults on ${NET.name} open after the contracts are deployed.`
                 : IS_MAINNET
                 ? `Quanlet is in a capped beta on Robinhood Chain. Use only amounts you can afford to lose${BETA.vaultCapEth ? `; the site accepts up to ${BETA.vaultCapEth} ETH per vault` : ''}.`
                 : 'Quanlet runs on Robinhood Chain testnet and is not live on mainnet yet. The vault uses the protocol 2.0 contracts on testnet, where ETH has no value.'}

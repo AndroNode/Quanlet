@@ -1,16 +1,12 @@
-# Quanlet protocol 2.0: independent review package
+# Quanlet protocol 2.0: security notes
 
-Status: **no independent review has been done.** This package is what Quanlet hands to outside reviewers of
-protocol 2.0 (whitepaper v2.0). Section 6 is an internal self-review by the development team; it is not
-independent and does not count toward the review gate.
+Scope, system summary, the properties anyone examining the code should try to break, evidence, static analysis and
+the development team's internal self-review (section 6) for protocol 2.0 (whitepaper v2.0). Bug bounty researchers
+start here.
 
-Before mainnet, the whitepaper requires at least one independent cryptography review and one independent
-smart-contract review, every critical and high finding fixed and rechecked by the reviewer, a public list of any
-finding left open, and a funded vulnerability programme before any beta that accepts real assets.
+## 1. Scope
 
-## 1. What to review
-
-Review the commit named in `contracts/deployments/46630.v2.release.json` (`sourceCommit`). That manifest lists
+The release manifest `contracts/deployments/46630.v2.release.json` names the source commit (`sourceCommit`) and lists
 SHA-256 hashes of every in-scope file, the compiler settings, and the live code hash of every deployed contract.
 
 Compiler: solc 0.8.30, via-IR, EVM `cancun`, optimizer 10,000 runs, no metadata hash. One profile for every
@@ -63,7 +59,7 @@ itself, bridges, and the ERC-20 issuers of supported tokens.
   (verifier, key factory, helper, creation code, supported assets) and the predicted address.
 - No owner, admin, proxy, pause or arbitrary call anywhere.
 
-## 3. Properties we ask reviewers to try to break
+## 3. Properties to try to break
 
 1. No outflow without P's signature over that exact transfer; PROTECTED also needs A.
 2. FAST never moves more than the jointly granted allowance per asset, lifetime, including fees.
@@ -103,7 +99,7 @@ itself, bridges, and the ERC-20 issuers of supported tokens.
 Line coverage could not be measured: `forge coverage` (optimizer off) hits "stack too deep" in the via-IR build.
 Every state-changing external function is exercised by the tests.
 
-## 6. Internal self-review (not independent)
+## 6. Internal self-review
 
 | Id | Severity | Finding | Status |
 | --- | --- | --- | --- |

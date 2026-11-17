@@ -1,15 +1,15 @@
 # Bug bounty programme (draft)
 
 Status: **draft, not launched, not funded.** The reward amounts below are a proposal. The budget, the platform
-and the launch date are the project owner's decision. Whitepaper §14 requires a funded programme before any beta that
-accepts real assets.
+and the launch date are the project owner's decision. The whitepaper (v2.0, section 18, Gate 4) requires a funded
+programme before any beta that accepts real assets.
 
 ## Proposed phases
 
 | Phase | When | Funds at risk | Rewards |
 | --- | --- | --- | --- |
 | 0. Testnet programme | Now, self-run | None (testnet only) | Small fixed rewards, see below |
-| 1. Beta programme | Before the first beta with real assets, after both reviews | Capped deposits | Full tiers below, funded in advance |
+| 1. Beta programme | Before the first beta with real assets | Capped deposits | Full tiers below, funded in advance |
 | 2. Mainnet programme | Mainnet launch | All deposits | Tiers raised in line with total value held |
 
 Recommendation: start Phase 0 now on the testnet contracts, self-run through `SECURITY.md`. Move to a

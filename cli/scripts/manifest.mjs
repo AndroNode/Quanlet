@@ -208,7 +208,7 @@ const manifest = {
   signingVectors: existsSync(vectorsPath) ? { path: rel(vectorsPath), sha256: fileHash(vectorsPath), generator: 'quanlet vectors' } : null,
   costs,
   gateB: existsSync(gateFile) ? JSON.parse(readFileSync(gateFile, 'utf8')) : { status: 'not recorded in this manifest' },
-  reviews: { reports: [], note: 'No independent review or audit report has been published. See docs/REVIEW-SCOPE.md for the scope offered to reviewers and docs/REVIEW-REQUEST.md for the request.' },
+  reviews: { reports: [], note: 'Internal security notes and self-review: docs/REVIEW-SCOPE.md.' },
   toolkit: { name: '@quanlet/cli', files: Object.fromEntries(toolkitFiles.map((p) => [p, fileHash(join(root, p))])) },
   liveCheck: live,
 };

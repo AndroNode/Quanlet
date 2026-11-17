@@ -1,7 +1,7 @@
 /**
  * Which network this build of the site serves. Testnet unless the build sets VITE_QUANLET_NETWORK=mainnet,
  * and the Worker that serves it must run with RELEASE_MODE = "mainnet" so /api/rpc reads the same chain.
- * A mainnet build opens vaults only once config.deployments.mainnetV2 holds the reviewed, deployed contracts;
+ * A mainnet build opens vaults only once config.deployments.mainnetV2 holds the deployed contracts;
  * until then the vault pages say so and touch no chain.
  */
 import { DEFAULT_CONFIG } from '@quanlet/config';

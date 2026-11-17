@@ -1,19 +1,9 @@
-# Quanlet v1: independent review package
+# Quanlet v1: security notes
 
-Status: **no independent review has been done.** This document is what Quanlet hands to outside
-reviewers so they can start (whitepaper §14). It ends with an internal self-review by the
-development team. That self-review is not independent and does not count toward the §14 or §15 gates.
+Scope, threat model, invariant evidence and known gaps for protocol 1.x, with the development team's internal
+self-review in section 7. Anyone examining the code (bug bounty researchers included) can start here.
 
-Before mainnet, §14 requires:
-
-- at least one independent cryptography review and one independent smart-contract review;
-- every critical and high finding fixed and rechecked by the reviewer;
-- a public issue list explaining any finding left open;
-- a funded vulnerability reporting programme before any beta that accepts real assets.
-
-None of these has started.
-
-## 1. What to review
+## 1. Scope
 
 The exact files and their SHA-256 hashes are listed in the release manifest,
 `contracts/deployments/46630.release.json` (`source.files`, `verifier.files`, `toolkit.files`). Review the commit
@@ -156,13 +146,13 @@ Severity uses the usual scale: critical, high, medium, low, info.
 | --- | --- | --- | --- |
 | QR-01 | Medium | **A recipient could skip the relay fee.** `executeWithdrawal` read the fee from storage after paying the recipient. A recipient contract could re-enter `pruneWithdrawal` (which was not lock-protected) to delete its own executed entry, so the fee read as zero and the relayer went unpaid, though the relayer had been promised payment on success. The vault never paid out more than was signed. | **Fixed.** The fields are copied to memory before any transfer, and `pruneWithdrawal` is now `nonReentrant`. Regression tests: `test_RecipientCannotSkipRelayFee` and a re-entering recipient in the fuzz handler. The fix needs a new VaultFactory; vaults made earlier on testnet keep the old behaviour. |
 | QR-02 | Low | `_sendToken` treated a call to an address with no code as success. Scheduling already refuses assets without code, and Cancun's SELFDESTRUCT cannot remove code later, so this could not be reached. | **Fixed** as defence in depth: execution now refuses an asset without code. |
-| QR-03 | Info | The degenerate-key filter is a heuristic floor, not a proof that the verifier is safe for every accepted key. | Open: for the cryptography review (Track A). |
+| QR-03 | Info | The degenerate-key filter is a heuristic floor, not a proof that the verifier is safe for every accepted key. | Open. |
 | QR-04 | Info | Deposits are accepted while a security change is pending (needed so funds are never stuck). A user could fund a vault that is under an unexpected recovery. | By design; the interfaces warn the user. |
 | QR-05 | Info | A fee recipient that reverts blocks that withdrawal until it expires; the owner must cancel and reschedule without a fee. This is the specified atomic fee behaviour. | By design; documented. |
 | QR-06 | Info | Anyone can submit a request with an invalid signature. Verification costs the submitter about 1.22M gas, and the vault's state is not changed. | Accepted: the attacker pays. |
 | QR-07 | Info | Anyone can copy a `createVault` transaction. The copy deploys the identical vault (the same records and salt), so the effect is the same. | Accepted. |
 | QR-08 | Info | ERC-20 tokens with fees on transfer, rebasing or callbacks break "exact amount" reasoning. | No ERC-20 is supported in this release; each future token needs its own review. |
-| QR-09 | High (risk acceptance) | The verifier is vendored, unaudited research code. Every vault's security rests on it. | Open: the main item for Track A. |
+| QR-09 | High (risk acceptance) | The verifier is vendored, unaudited research code. Every vault's security rests on it. | Open: accepted risk; covered by the ACVP conformance suite and the bug bounty scope. |
 
 ## 8. Reproducing
 

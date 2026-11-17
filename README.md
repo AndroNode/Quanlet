@@ -116,7 +116,7 @@ policy change in the transaction that proposed it, so any device can finalize it
 `quanlet v2 vectors`), `cli/scripts/drill2.mjs` (the live testnet exit drill, record in `contracts/deployments/46630.v2.exit-drill.json`), `cli/test/e2e2.mjs` (against a local fork, see its
 header) and `forge test --match-contract CliV2Test` (encoders against the contracts).
 
-## Release manifest and reviews
+## Release manifest and security notes
 
 `node cli/scripts/manifest.mjs --chain 46630 --rpc <RPC URL>` writes `contracts/deployments/46630.release.json`,
 the whitepaper section 17 manifest: source commit and file hashes, compiler settings, verifier provenance, every
@@ -124,19 +124,20 @@ contract's address and code hash (live code is compared with the local build, im
 key preparation format, supported assets (ETH only), signing vectors (`cli/vectors/46630.json`), Foundry gas
 (`GasReport.t.sol`) and live receipt costs, the Gate B record written by `Smoke.s.sol`, and toolkit file hashes.
 
-`docs/REVIEW-SCOPE.md` is the package for the independent cryptography and smart-contract reviews (scope,
-threat model, invariant evidence, known gaps, an internal self-review). No independent review has been done yet.
-`docs/REVIEW-REQUEST.md` holds the draft request letter and a shortlist of firms (not sent).
+`docs/REVIEW-SCOPE-V2.md` (protocol 2.0) and `docs/REVIEW-SCOPE.md` (1.x) are the security notes: scope, threat
+model, properties to break, invariant evidence, known gaps and the internal self-review.
 
 `docs/ACVP.md`: all 60 NIST ACVP ML-DSA-44 signature-verification vectors give the NIST result through the
-on-chain verifier code (`forge test --match-contract AcvpTest`). This is a conformance check, not a review.
+on-chain verifier code (`forge test --match-contract AcvpTest`).
 
 `SECURITY.md` says how to report a vulnerability. `docs/BUG-BOUNTY.md` is the draft bug bounty (not funded yet).
 
-## Mainnet gates (open)
+## Before mainnet (open)
 
-- **Independent reviews**: one cryptography review and one smart-contract review (whitepaper section 14), with
-  critical and high findings fixed and rechecked, and a funded vulnerability programme before real assets.
+- **Funded bug bounty** before any beta with real assets (`docs/BUG-BOUNTY.md`).
+- **Beta settings**: supported assets, the per-vault cap the site enforces (`packages/config`, `beta`), who may join.
+- **Deployment**: a fresh deployer wallet, the deploy with the explicit go-ahead phrase, source verification and
+  the mainnet release manifest; then the mainnet addresses in `packages/config` (`mainnetV2`) and a mainnet build.
 - **Gate B on mainnet**: run the smoke test against chain 4663 before announcing.
 
 ## Licences

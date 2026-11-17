@@ -80,7 +80,7 @@ export default function HowItWorks() {
           <div className="card flat">
             <h3>Where it runs</h3>
             <p className="small">
-              Key records, the vault, its policy, allowances and timers live on Robinhood Chain, and ML-DSA-44 signatures are verified by a contract. Your keys are made and kept on your devices. Quanlet runs on Robinhood Chain testnet today, where ETH has no value; mainnet follows the independent reviews.
+              Key records, the vault, its policy, allowances and timers live on Robinhood Chain, and ML-DSA-44 signatures are verified by a contract. Your keys are made and kept on your devices. Quanlet runs on Robinhood Chain testnet today, where ETH has no value; mainnet follows the testnet.
             </p>
           </div>
         </div>
