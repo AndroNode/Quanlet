@@ -14,7 +14,8 @@ import {VaultFactoryV2} from "../src/v2/VaultFactoryV2.sol";
 ///
 ///   FOUNDRY_PROFILE=deploy forge script script/DeployV2.s.sol --rpc-url robinhood_testnet --broadcast
 ///
-/// Reads DEPLOYER_PRIVATE_KEY from the environment. Writes deployments/<chainId>.v2.json.
+/// Reads DEPLOYER_PRIVATE_KEY from the environment. Writes deployments/<chainId>.v2.json, or the same name under
+/// QUANLET_DEPLOY_OUT (for example deployments/rehearsal/) so a fork rehearsal never overwrites a real manifest.
 /// Mainnet (4663) refuses to run unless QUANLET_MAINNET_GO=I_ACCEPT_THE_MAINNET_GATES is set.
 contract DeployV2 is Script {
     uint256 constant MAINNET = 4663;
@@ -67,7 +68,7 @@ contract DeployV2 is Script {
         vm.serializeBytes32(k, "dependencyManifestHash", factory.dependencyManifestHash());
         string memory json = vm.serializeAddress(k, "vaultFactoryV2", address(factory));
 
-        string memory path = string.concat("deployments/", vm.toString(block.chainid), ".v2.json");
+        string memory path = string.concat(vm.envOr("QUANLET_DEPLOY_OUT", string("deployments/")), vm.toString(block.chainid), ".v2.json");
         vm.writeJson(json, path);
         console2.log("manifest written to", path);
         console2.log("KeyFactoryV2  ", address(keys));

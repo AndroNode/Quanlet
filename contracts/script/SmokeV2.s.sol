@@ -15,7 +15,9 @@ import {QuanletV2 as C, Policy, AssetRule} from "../src/v2/QuanletV2.sol";
 ///   FOUNDRY_PROFILE=deploy forge script script/SmokeV2.s.sol --rpc-url robinhood_testnet --broadcast
 ///
 /// Reads DEPLOYER_PRIVATE_KEY. Key seeds are derived from it and never printed, so only the deployer can
-/// control the smoke vault. Refuses to run on mainnet. Writes deployments/<chainId>.v2.gate-b.json.
+/// control the smoke vault. On mainnet (4663) it moves 0.0004 ETH and runs only with
+/// QUANLET_MAINNET_GO=I_ACCEPT_THE_MAINNET_GATES; 0.0002 ETH stays in the smoke vault, under the deployer's keys.
+/// Reads and writes under QUANLET_DEPLOY_OUT (default deployments/): <chainId>.v2.json in, <chainId>.v2.gate-b.json out.
 contract SmokeV2 is Script {
     uint256 constant FUND = 0.0004 ether;
     uint256 constant STEP = 0.0001 ether;
@@ -25,8 +27,14 @@ contract SmokeV2 is Script {
     uint256 pk;
 
     function run() external {
-        require(block.chainid != 4663, "smoke test is testnet only");
-        string memory j = vm.readFile(string.concat("deployments/", vm.toString(block.chainid), ".v2.json"));
+        if (block.chainid == 4663) {
+            require(
+                keccak256(bytes(vm.envOr("QUANLET_MAINNET_GO", string("")))) == keccak256("I_ACCEPT_THE_MAINNET_GATES"),
+                "mainnet gates not cleared"
+            );
+        }
+        string memory dir = vm.envOr("QUANLET_DEPLOY_OUT", string("deployments/"));
+        string memory j = vm.readFile(string.concat(dir, vm.toString(block.chainid), ".v2.json"));
         keys = KeyFactoryV2(vm.parseJsonAddress(j, ".keyFactoryV2"));
         factory = VaultFactoryV2(vm.parseJsonAddress(j, ".vaultFactoryV2"));
         pk = vm.envUint("DEPLOYER_PRIVATE_KEY");
@@ -95,7 +103,7 @@ contract SmokeV2 is Script {
         vm.serializeBool(k, "fastOverAllowanceRefused", true);
         vm.serializeBool(k, "primaryOnlyProtectedRefused", true);
         string memory json = vm.serializeUint(k, "vaultBalanceAfterWei", address(v).balance);
-        vm.writeJson(json, string.concat("deployments/", vm.toString(block.chainid), ".v2.gate-b.json"));
+        vm.writeJson(json, string.concat(vm.envOr("QUANLET_DEPLOY_OUT", string("deployments/")), vm.toString(block.chainid), ".v2.gate-b.json"));
         console2.log("smoke vault", address(v));
     }
 

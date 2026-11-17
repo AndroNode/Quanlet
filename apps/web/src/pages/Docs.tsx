@@ -1,6 +1,22 @@
 import type { ReactNode } from 'react';
 import { PageFacts, PageMark } from '../components/PageMarks';
 import { useUi } from '../store';
+import { DEFAULT_CONFIG } from '@quanlet/config';
+import { IS_MAINNET } from '../net';
+
+const MAINNET_V2 = DEFAULT_CONFIG.deployments.mainnetV2;
+const longDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+/** Protocol 2.0 on Robinhood Chain mainnet, from packages/config (written from contracts/deployments/4663.v2.json). */
+const MAINNET: Array<[string, string]> = MAINNET_V2
+  ? [
+      ['KeyFactoryV2', MAINNET_V2.keyFactory],
+      ['VaultFactoryV2 (ETH only)', MAINNET_V2.vaultFactory],
+      ...MAINNET_V2.vaultCodeStores.map((a, i): [string, string] => [`Vault code store ${i + 1}`, a]),
+      ['ML-DSA-44 verifier', MAINNET_V2.verifier],
+      ...(MAINNET_V2.f1600Helper ? [['F1600 helper', MAINNET_V2.f1600Helper] as [string, string]] : []),
+    ]
+  : [];
+const LIVE_SINCE = MAINNET_V2?.deployedOn ? longDate(MAINNET_V2.deployedOn) : null;
 
 
 // From contracts/deployments/46630.v2.json and 46630.v2.tokens.json (protocol 2.0 testnet contracts).
@@ -45,14 +61,43 @@ const SECTIONS: Array<{ id: string; title: string; ref: string; body: ReactNode 
     ref: '§§01, 18',
     body: (
       <>
-        <p>As of 16 November 2026, Quanlet is at the testnet stage and mainnet is not live. The whitepaper specifies protocol 2.0. Deployed features and contract addresses are identified by release manifests, not by the whitepaper.</p>
+        {IS_MAINNET ? (
+          <p>
+            {MAINNET_V2
+              ? `${LIVE_SINCE ? `Quanlet has run protocol 2.0 on Robinhood Chain mainnet since ${LIVE_SINCE}` : 'Quanlet runs protocol 2.0 on Robinhood Chain mainnet'}. Vaults hold ETH only. The whitepaper specifies protocol 2.0. Deployed features and contract addresses are identified by release manifests, not by the whitepaper.`
+              : 'Quanlet is preparing its Robinhood Chain mainnet deployment; the mainnet contracts are not deployed yet. The whitepaper specifies protocol 2.0. Deployed features and contract addresses are identified by release manifests, not by the whitepaper.'}
+          </p>
+        ) : (
+          <p>As of 16 November 2026, Quanlet is at the testnet stage and mainnet is not live. The whitepaper specifies protocol 2.0. Deployed features and contract addresses are identified by release manifests, not by the whitepaper.</p>
+        )}
         <p>
-          Release follows these stages: encoding conformance; cryptographic and chain feasibility; a complete personal-vault testnet; a capped real-asset beta; production personal vaults; then separate product expansion. Availability is set by completed gates, never by a calendar or token milestone.
+          Release follows these stages: encoding conformance; cryptographic and chain feasibility; a complete personal-vault testnet; production personal vaults; then separate product expansion. Availability is set by completed gates, never by a calendar or token milestone.
         </p>
-        <p>The vault on this website runs the protocol 2.0 contracts listed below on Robinhood Chain testnet, where ETH has no value.</p>
+        {IS_MAINNET ? (
+          MAINNET_V2 && <p>The vault on this website runs the protocol 2.0 contracts listed below on Robinhood Chain mainnet. Deposits are real ETH.</p>
+        ) : (
+          <p>The vault on this website runs the protocol 2.0 contracts listed below on Robinhood Chain testnet, where ETH has no value.</p>
+        )}
       </>
     ),
   },
+  ...(IS_MAINNET && MAINNET_V2
+    ? [
+        {
+          id: 'mainnet',
+          title: 'Mainnet deployment',
+          ref: 'chain 4663',
+          body: (
+            <>
+              <p>
+                Robinhood Chain (chain id 4663). Five keys per vault, FAST and protected routes, an optional protected delay and guardian recovery, as described on this page. Vaults hold ETH only; tokens sent to a vault cannot be moved out of it. The contracts have no owner, no pause and no upgrade path.
+              </p>
+              <DeployTable rows={MAINNET} />
+            </>
+          ),
+        },
+      ]
+    : []),
   {
     id: 'testnet',
     title: 'Testnet deployment',
@@ -243,7 +288,12 @@ const SECTIONS: Array<{ id: string; title: string; ref: string; body: ReactNode 
 ];
 
 const FAQ: Array<[string, string]> = [
-  ['Is it live?', 'Not on mainnet. As of 16 November 2026 Quanlet is at the testnet stage. The vault runs the protocol 2.0 contracts on Robinhood Chain testnet, where ETH has no value. Nothing here holds real funds yet.'],
+  [
+    'Is it live?',
+    IS_MAINNET && MAINNET_V2
+      ? `Yes. ${LIVE_SINCE ? `Quanlet has been live on Robinhood Chain mainnet since ${LIVE_SINCE}` : 'Quanlet is live on Robinhood Chain mainnet'}, for ETH only. The protocol 2.0 testnet stays deployed for practice, where ETH has no value.`
+      : 'Not on mainnet. As of 16 November 2026 Quanlet is at the testnet stage. The vault runs the protocol 2.0 contracts on Robinhood Chain testnet, where ETH has no value. Nothing here holds real funds yet.',
+  ],
   ['Does connecting my wallet protect it?', 'No. Connecting shares a public address and nothing else. Only assets moved into a configured Quanlet vault fall under its rules.'],
   ['Do withdrawals have to wait?', 'Not by default. A protected payment signed by both the primary and the approver executes at once unless you elect a 1, 24 or 72 hour timelock. FAST payments inside a finite allowance are also immediate.'],
   ['What if my primary key is stolen?', 'Alone it cannot move the reserve, because protected payments also need the approver. If you enabled a FAST allowance, a thief can spend only what is left of it before it expires. The approver can suspend FAST and invalidate approvals, and two guardians can start recovery.'],
@@ -303,11 +353,11 @@ export default function Docs() {
             <ul>
               <li>There is no hosted relayer: the vault pages can sign a transfer for a relayer and submit one, but nobody runs a relayer service yet.</li>
               <li>The deployed 2.0 vault contract is 26,712 bytes, larger than Ethereum’s 24,576-byte limit. Robinhood Chain testnet and mainnet both accept contracts up to 98,304 bytes.</li>
-              <li>No mainnet address has been published.</li>
+              {!(IS_MAINNET && MAINNET_V2) && <li>No mainnet address has been published.</li>}
+              {IS_MAINNET && MAINNET_V2 && <li>Mainnet vaults hold ETH only. Supporting tokens needs a new vault factory; existing vaults keep the assets they were created with.</li>}
               <li>The onchain verifier gives NIST's result on all 60 official ML-DSA-44 signature-verification test vectors (ACVP). That shows it follows FIPS 204 on those cases.</li>
               <li>Protocol 2.0 gas, measured in Foundry: registering and activating a key about 12.6 million, creating a vault with five consents about 13.5 million, a FAST transfer about 1.7 million, a protected transfer about 3.2 million, and starting a recovery about 6.4 million.</li>
               <li>The source code and the standalone toolkit are published on GitHub (contracts MIT, everything else AGPL-3.0). A separate local signing interface is not published.</li>
-              <li>A bug bounty programme is drafted but not funded. It must be funded before any beta that accepts real assets.</li>
               <li>The official X account and support channels are not announced.</li>
             </ul>
           </section>

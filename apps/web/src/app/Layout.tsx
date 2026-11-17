@@ -6,7 +6,7 @@ import { STATE } from '../testnet/v2/chain';
 import { Ext, link } from '../pages/Testnet';
 import { VaultAppProvider, useVaultApp } from './context';
 import { PendingCard, STATE_TEXT } from './panels';
-import { BETA, IS_MAINNET, NET, VAULTS_OPEN, WORDS } from '../net';
+import { IS_MAINNET, NET, VAULTS_OPEN, WORDS } from '../net';
 import './app.css';
 
 /**
@@ -92,18 +92,6 @@ function AppFrame() {
         </div>
       </div>
       <div className="wrap app-main">
-        {IS_MAINNET && (
-          <div className="notice app-beta" role="note">
-            <strong>Capped beta.</strong> The contracts are new. Use only amounts you can afford to lose
-            {BETA.vaultCapEth ? `; this site accepts up to ${BETA.vaultCapEth} ETH per vault` : ''}.
-            {BETA.termsUrl && (
-              <>
-                {' '}
-                <a href={BETA.termsUrl}>Read the beta terms and risk notice</a>.
-              </>
-            )}
-          </div>
-        )}
         {profile?.vault && view && pending && (
           <div className="app-pending">
             <PendingCard profile={profile} view={view} now={app.now} busy={app.busy} ready={app.ready} run={app.run} refresh={app.refresh} />

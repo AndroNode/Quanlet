@@ -1,7 +1,7 @@
 # Quanlet v1: security notes
 
 Scope, threat model, invariant evidence and known gaps for protocol 1.x, with the development team's internal
-self-review in section 7. Anyone examining the code (bug bounty researchers included) can start here.
+self-review in section 7. Anyone examining the code can start here.
 
 ## 1. Scope
 
@@ -152,7 +152,7 @@ Severity uses the usual scale: critical, high, medium, low, info.
 | QR-06 | Info | Anyone can submit a request with an invalid signature. Verification costs the submitter about 1.22M gas, and the vault's state is not changed. | Accepted: the attacker pays. |
 | QR-07 | Info | Anyone can copy a `createVault` transaction. The copy deploys the identical vault (the same records and salt), so the effect is the same. | Accepted. |
 | QR-08 | Info | ERC-20 tokens with fees on transfer, rebasing or callbacks break "exact amount" reasoning. | No ERC-20 is supported in this release; each future token needs its own review. |
-| QR-09 | High (risk acceptance) | The verifier is vendored, unaudited research code. Every vault's security rests on it. | Open: accepted risk; covered by the ACVP conformance suite and the bug bounty scope. |
+| QR-09 | High (risk acceptance) | The verifier is vendored, unaudited research code. Every vault's security rests on it. | Open: accepted risk; covered by the ACVP conformance suite. |
 
 ## 8. Reproducing
 
@@ -169,5 +169,4 @@ Tests need `node` and `python3` for the FFI signer and the reference preparation
 
 ## 9. Reporting
 
-See `SECURITY.md` at the repository root. Please do not open public issues for vulnerabilities. A funded
-programme is a precondition of any beta that accepts real assets (§14); the draft is `docs/BUG-BOUNTY.md`.
+See `SECURITY.md` at the repository root. Please do not open public issues for vulnerabilities.

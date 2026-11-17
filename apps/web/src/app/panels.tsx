@@ -83,7 +83,8 @@ import {
   type SlotName,
 } from '../testnet/v2/profile';
 import { Ext, WalletCard, eq, left, link, when, type Activity } from '../pages/Testnet';
-import { BETA, IS_MAINNET, WORDS } from '../net';
+import { IS_MAINNET, WORDS } from '../net';
+import { RiskNotice, riskAccepted } from './RiskNotice';
 
 export const DELAY_TEXT: Record<number, string> = { 0: 'No delay', 3600: '1 hour', 86400: '24 hours', 259200: '72 hours' };
 export const STATE_TEXT: Record<number, string> = {
@@ -784,9 +785,8 @@ export function DepositForm({ profile, view, busy, ready, run, refresh }: { prof
   const depA = assetOf(depAsset);
   const depAmount = unitsOk(dep, depA.decimals) ? units(dep, depA.decimals) : 0n;
   const tooMuch = mine !== null && depAmount > mine;
-  // Mainnet beta: the site keeps a vault's ETH under the published cap (a website limit; the contracts have none).
-  const cap = IS_MAINNET && BETA.vaultCapEth ? parseUnits(BETA.vaultCapEth, 18) : null;
-  const overCap = cap !== null && depAsset === ETH && (view?.balance ?? 0n) + depAmount > cap;
+  const [risk, setRisk] = useState(() => !IS_MAINNET || riskAccepted());
+  if (!risk) return <RiskNotice onAccept={() => setRisk(true)} />;
   return (
     <form
       className="tn-form card stack"
@@ -833,12 +833,7 @@ export function DepositForm({ profile, view, busy, ready, run, refresh }: { prof
           Your wallet holds {fmt(mine, depAsset)}.{!IS_MAINNET && depAsset !== ETH && mine === 0n ? ' Get test stock tokens from the Robinhood faucet.' : ''}
         </p>
       )}
-      {overCap && (
-        <p className="small tn-err">
-          During the beta this site keeps each vault at or below {BETA.vaultCapEth} ETH. The vault holds {fmt(view?.balance ?? 0n, ETH)} now.
-        </p>
-      )}
-      <button className="btn primary" disabled={!ready || busy || !depAmount || (pending && !depOk) || tooMuch || overCap}>
+      <button className="btn primary" disabled={!ready || busy || !depAmount || (pending && !depOk) || tooMuch}>
         {pending ? 'Deposit anyway' : `Deposit ${depA.symbol}`}
       </button>
       {!ready && <p className="small muted">Connect your wallet to deposit.</p>}

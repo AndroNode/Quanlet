@@ -1,8 +1,8 @@
 # Quanlet protocol 2.0: security notes
 
 Scope, system summary, the properties anyone examining the code should try to break, evidence, static analysis and
-the development team's internal self-review (section 6) for protocol 2.0 (whitepaper v2.0). Bug bounty researchers
-start here.
+the development team's internal self-review (section 6) for protocol 2.0 (whitepaper v2.0). Anyone examining the
+code can start here.
 
 ## 1. Scope
 
@@ -111,4 +111,4 @@ Every state-changing external function is exercised by the tests.
 ## 7. Known limitations
 
 - No hosted relayer; any wallet can submit a signed transfer.
-- Mainnet supported assets are not decided.
+- Mainnet supports ETH only (decided 17 November 2026); tokens need a separate factory later.

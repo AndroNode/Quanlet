@@ -130,15 +130,21 @@ model, properties to break, invariant evidence, known gaps and the internal self
 `docs/ACVP.md`: all 60 NIST ACVP ML-DSA-44 signature-verification vectors give the NIST result through the
 on-chain verifier code (`forge test --match-contract AcvpTest`).
 
-`SECURITY.md` says how to report a vulnerability. `docs/BUG-BOUNTY.md` is the draft bug bounty (not funded yet).
+`SECURITY.md` says how to report a vulnerability. `docs/RISK-NOTICE.md` is the risk notice a person acknowledges
+before their first deposit on mainnet.
 
 ## Before mainnet (open)
 
-- **Funded bug bounty** before any beta with real assets (`docs/BUG-BOUNTY.md`).
-- **Beta settings**: supported assets, the per-vault cap the site enforces (`packages/config`, `beta`), who may join.
-- **Deployment**: a fresh deployer wallet, the deploy with the explicit go-ahead phrase, source verification and
-  the mainnet release manifest; then the mainnet addresses in `packages/config` (`mainnetV2`) and a mainnet build.
-- **Gate B on mainnet**: run the smoke test against chain 4663 before announcing.
+Mainnet launches directly (no beta), ETH only. `docs/MAINNET-RUNBOOK.md` has every step:
+
+- **Deployer wallet**: a fresh wallet with about 0.005 ETH on Robinhood Chain, its key in a git-ignored env file.
+- **Rehearsal**: `contracts/script/rehearse-mainnet.sh` runs the whole launch on a local mainnet fork (no key,
+  nothing broadcast).
+- **Deployment**: the deploy with the explicit go-ahead phrase, source verification and the release manifest
+  (`cli/scripts/release2.mjs`).
+- **Smoke test on mainnet**: a tiny vault with one FAST and one protected transfer and two refusals.
+- **Site switch**: `cli/scripts/mainnet-config.mjs` writes `mainnetV2` into `packages/config`,
+  `cli/scripts/mainnet-preflight.mjs` checks it against the chain, then a mainnet build.
 
 ## Licences
 

@@ -73,19 +73,15 @@ export const ConfigSchema = z.object({
         compatibleVaultFactories: z.array(address).default([]),
         tokens: z.array(z.object({ symbol: z.string(), name: z.string(), address, decimals: z.number().int() })).default([]),
         deployedAtBlock: z.number().int().nonnegative().optional(),
+        /** The rest of the deployment, shown on the Docs page (contracts/deployments/4663.v2.json). */
+        f1600Helper: address.optional(),
+        vaultCodeStores: z.array(address).default([]),
+        /** Day of the deployment block, YYYY-MM-DD (UTC). */
+        deployedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
       })
       .nullable()
       .default(null),
   }),
-  /** The capped mainnet beta. Shown only on a mainnet build; every value stays null until the owner sets it. */
-  beta: z
-    .object({
-      /** Most ETH the site lets one vault hold during the beta (a website limit; the contracts have none). */
-      vaultCapEth: z.string().regex(/^\d+(\.\d+)?$/).nullable(),
-      /** Where the approved beta terms and risk notice are published. */
-      termsUrl: z.string().nullable(),
-    })
-    .default({ vaultCapEth: null, termsUrl: null }),
   assets: z.array(z.object({ symbol: z.string(), address: address.nullable(), decimals: z.number().int(), reviewed: z.boolean() })),
 });
 
@@ -141,9 +137,10 @@ export const DEFAULT_CONFIG: QuanletConfig = {
       ],
     },
     mainnet: null,
+    // mainnetV2:begin (written by cli/scripts/mainnet-config.mjs from contracts/deployments/4663.v2.json)
     mainnetV2: null,
+    // mainnetV2:end
   },
-  beta: { vaultCapEth: null, termsUrl: null },
   assets: [{ symbol: 'ETH', address: null, decimals: 18, reviewed: true }],
 };
 

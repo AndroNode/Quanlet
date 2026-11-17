@@ -11,3 +11,7 @@ __pycache__/
 
 # Not published
 docs/*.pdf
+.env.*
+*.env
+contracts/deployments/rehearsal/
+*.local.ts

@@ -1,8 +1,8 @@
-# Mainnet beta: risk notice
+# Mainnet: risk notice
 
 The text a person reads and acknowledges before their first deposit on a mainnet build of the site, one tick per
-section. It describes how the product behaves; keep it in step with the contracts and the site. `[cap]` is the
-per-vault limit set in `packages/config` (`beta.vaultCapEth`).
+section (apps/web/src/app/RiskNotice.tsx shows it). It describes how the product behaves; keep both in step with the
+contracts and the site.
 
 ### 1. You hold the keys. Nobody can undo a mistake.
 
@@ -46,9 +46,6 @@ The contracts cannot be patched: if a flaw is found, the only fix is to move ass
 still allows that. Post-quantum signatures (ML-DSA-44, NIST FIPS 204) are new to blockchains, and the on-chain
 verifier is vendored from Fireblocks Labs (MIT).
 
-During the beta this website keeps each vault at or below [cap] ETH. That is a limit of this website only: the
-contracts accept any deposit, and anyone can send assets straight to a vault's address.
-
 > I understand that the software may contain flaws that cause a total loss, and that I should deposit only what I
 > can afford to lose.
 
@@ -56,8 +53,8 @@ contracts accept any deposit, and anyone can send assets straight to a vault's a
 
 - **Robinhood Chain** is operated by others. It can stop producing blocks, delay transactions or change. Bridges
   to and from it carry their own risks.
-- **Tokens** are issued by others, who may be able to freeze or change them. A vault only protects who may move
-  them.
+- **Only ETH** can be moved out of a vault on mainnet. Tokens sent to a vault address stay there for good:
+  the vault cannot transfer them.
 - **This website** can be unavailable. Your vault keeps working without it; the standalone toolkit can sign and
   send every action through any RPC.
 - **Your devices and wallet**: Quanlet cannot protect a compromised computer, phone or browser. Quanlet never asks

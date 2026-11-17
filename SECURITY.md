@@ -12,10 +12,12 @@ Please report privately. Do not open a public issue.
 
 Test only on Robinhood Chain testnet or a local fork, never against other people's vaults.
 
-## Scope and rewards
+## Scope
 
-The scope, severity levels and the proposed rewards are in `docs/BUG-BOUNTY.md`. The programme is a draft
-and is not funded yet, so rewards are not guaranteed until it launches.
+The contracts in `contracts/src` (protocol 2.0 in `contracts/src/v2`), the ML-DSA-44 verifier and its helper, the
+key backup format, and the signing path of the website's vault pages and the toolkit (`cli/`): anything that moves
+funds without the required signatures, makes a client sign something other than what it shows, or leaks key
+material. There is no paid reward programme.
 
 ## What is already known
 

@@ -13,14 +13,13 @@ export const NET = DEFAULT_CONFIG.networks[NETWORK];
 export const DEPLOYMENT_V2 = IS_MAINNET ? DEFAULT_CONFIG.deployments.mainnetV2 : DEFAULT_CONFIG.deployments.testnetV2;
 /** False on a mainnet build before the contracts are deployed: the vault pages show a notice instead. */
 export const VAULTS_OPEN = !!DEPLOYMENT_V2;
-export const BETA = DEFAULT_CONFIG.beta;
 
 /** Words that change with the network, so the copy never says testnet on mainnet or the other way round. */
 export const WORDS = IS_MAINNET
   ? {
-      phase: 'mainnet beta',
+      phase: 'mainnet',
       gas: 'It pays the gas for each step. It never holds or controls your keys.',
-      funds: 'Move ETH or supported tokens from your wallet into the vault.',
+      funds: 'Move ETH from your wallet into the vault.',
       intro: 'Set one up on Robinhood Chain in six steps.',
       keysWarning: 'Keep each backup and its password apart. Anyone with both can sign as that key.',
       chipTitle: 'Every action here is a real transaction on Robinhood Chain',

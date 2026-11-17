@@ -3,7 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { tokenState } from '@quanlet/config';
 import { useUi } from '../store';
 import { Dialog } from './ui';
-import { BETA, IS_MAINNET, NET, VAULTS_OPEN, WORDS } from '../net';
+import { IS_MAINNET, NET, VAULTS_OPEN, WORDS } from '../net';
 import { EXPLORER, TARGET_CHAIN, TARGET_NAME, formatEth, short, startWalletDiscovery, useWallet } from '../wallet';
 
 
@@ -357,7 +357,7 @@ export function Footer() {
               {IS_MAINNET && !VAULTS_OPEN
                 ? `Quanlet vaults on ${NET.name} open after the contracts are deployed.`
                 : IS_MAINNET
-                ? `Quanlet is in a capped beta on Robinhood Chain. Use only amounts you can afford to lose${BETA.vaultCapEth ? `; the site accepts up to ${BETA.vaultCapEth} ETH per vault` : ''}.`
+                ? `Quanlet runs on ${NET.name}. Vault contracts cannot be changed or paused by anyone; transfers your keys sign are final.`
                 : 'Quanlet runs on Robinhood Chain testnet and is not live on mainnet yet. The vault uses the protocol 2.0 contracts on testnet, where ETH has no value.'}
             </p>
             <p>
