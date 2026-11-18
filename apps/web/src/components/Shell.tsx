@@ -140,26 +140,64 @@ function XButton() {
   );
 }
 
-function CaChip() {
+/** Copies the token contract address and says so; `full` shows the whole address (footer), otherwise a short form. */
+export function CaCopy({ full = false, className = '' }: { full?: boolean; className?: string }) {
   const cfg = useUi((s) => s.config);
   const t = tokenState(cfg);
   const [copied, setCopied] = useState(false);
-  const [open, setOpen] = useState(false);
-  if (t.caReady) {
-    return (
-      <button
-        className="chip"
-        title={t.tooltip}
-        onClick={async () => {
-          await navigator.clipboard?.writeText(cfg.token.contractAddress!);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        }}
-      >
-        {copied ? 'Copied' : t.label}
+  const timer = useRef<number>();
+  useEffect(() => () => clearTimeout(timer.current), []);
+  if (!t.caReady) return null;
+  const ca = cfg.token.contractAddress!;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(ca);
+    } catch {
+      // Older browsers or a blocked clipboard: select the text so it can be copied by hand.
+      const r = document.createRange();
+      const el = document.getElementById(full ? 'ca-full' : 'ca-short');
+      if (el) {
+        r.selectNodeContents(el);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(r);
+      }
+      return;
+    }
+    setCopied(true);
+    clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setCopied(false), 1600);
+  };
+  return (
+    <span className={`ca ${full ? 'ca-full' : 'ca-short'} ${copied ? 'is-copied' : ''} ${className}`}>
+      <span className="ca-k">CA</span>
+      <span className="ca-v" id={full ? 'ca-full' : 'ca-short'} title={ca}>
+        {full ? ca : short(ca)}
+      </span>
+      <button type="button" className="ca-btn" onClick={() => void copy()} aria-label={copied ? 'Contract address copied' : `Copy contract address ${ca}`}>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden>
+          {copied ? (
+            <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          ) : (
+            <>
+              <rect x="5.5" y="5.5" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="1.3" />
+              <path d="M10.5 3.5v-1h-8v8h1" fill="none" stroke="currentColor" strokeWidth="1.3" />
+            </>
+          )}
+        </svg>
+        <span className="ca-btn-t">{copied ? 'Copied' : 'Copy'}</span>
       </button>
-    );
-  }
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Contract address copied' : ''}
+      </span>
+    </span>
+  );
+}
+
+function CaChip() {
+  const cfg = useUi((s) => s.config);
+  const t = tokenState(cfg);
+  const [open, setOpen] = useState(false);
+  if (t.caReady) return <CaCopy />;
   return (
     <>
       <button className="chip" title={t.tooltip} aria-label={`${t.label}. ${t.tooltip}`} onClick={() => setOpen(true)}>
@@ -294,6 +332,9 @@ export function Header() {
         </Link>
         <TopNav />
         <div className="header-actions">
+          <span className="ca-slot">
+            <CaCopy />
+          </span>
           <span className="x-slot">
             <XButton />
           </span>
@@ -325,6 +366,31 @@ export function Header() {
   );
 }
 
+/** The token contract address in full, with copy, explorer and X links. */
+function FooterToken() {
+  const cfg = useUi((s) => s.config);
+  const t = tokenState(cfg);
+  if (!t.caReady && !cfg.social.x) return null;
+  return (
+    <div className="footer-token">
+      {t.caReady && (
+        <>
+          <span className="footer-token-k">{cfg.token.ticker} token on {cfg.token.network}</span>
+          <CaCopy full />
+          <a className="footer-token-l" href={t.explorerHref!} target="_blank" rel="noopener noreferrer">
+            View on explorer
+          </a>
+        </>
+      )}
+      {cfg.social.x && (
+        <a className="footer-token-l" href={cfg.social.x} target="_blank" rel="noopener noreferrer">
+          @{cfg.social.x.replace(/^https?:\/\/(www\.)?(x|twitter)\.com\//, '')} on X
+        </a>
+      )}
+    </div>
+  );
+}
+
 export function Footer() {
   return (
     <footer className="footer">
@@ -333,6 +399,7 @@ export function Footer() {
           <img src="/brand/quanlet-mark-on-dark.svg" alt="" width={44} height={44} />
           <span className="footer-word">Quanlet</span>
           <span className="caps footer-tag">Post-quantum asset protection · Robinhood Chain</span>
+          <FooterToken />
         </div>
         <div className="cols">
           <nav aria-label="Product" className="stack">

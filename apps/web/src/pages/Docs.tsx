@@ -301,7 +301,7 @@ const FAQ: Array<[string, string]> = [
   ['Can I recover a lost key?', 'Yes, while two guardians are available: any two of your three guardians can replace the primary and the approver together after 7 days. Without the spending pair and without a guardian quorum, the funds cannot be recovered.'],
   ['What if two guardians collude?', 'They can replace your spending pair after the 7-day delay and can repeatedly freeze the vault. Neither the spending keys nor one honest guardian can veto them, so choose independent guardians.'],
   ['Is all of Robinhood Chain quantum-resistant?', 'No. Quanlet uses post-quantum signatures for vault authorization only. The chain, bridges, token contracts and your other accounts keep their own security.'],
-  ['Do I need a token?', 'No. Custody, signing, recovery and withdrawals work without any Quanlet token, and none has been announced.'],
+  ['Do I need a token?', 'No. Custody, signing, recovery and withdrawals work without any token. The QUANLET token on Robinhood Chain (0x62cc5a8Ad309c306fC744d901517Fa38993a5235) is separate from the vault contracts and gives no power over any vault.'],
   ['Are withdrawals free?', 'The vault charges no exit fee. Someone still pays network gas in ETH, and an optional relay may charge a fixed ETH fee that the required signers see and approve.'],
 ];
 
@@ -358,7 +358,7 @@ export default function Docs() {
               <li>The onchain verifier gives NIST's result on all 60 official ML-DSA-44 signature-verification test vectors (ACVP). That shows it follows FIPS 204 on those cases.</li>
               <li>Protocol 2.0 gas, measured in Foundry: registering and activating a key about 12.6 million, creating a vault with five consents about 13.5 million, a FAST transfer about 1.7 million, a protected transfer about 3.2 million, and starting a recovery about 6.4 million.</li>
               <li>The source code and the standalone toolkit are published on GitHub (contracts MIT, everything else AGPL-3.0). A separate local signing interface is not published.</li>
-              <li>The official X account and support channels are not announced.</li>
+              <li>The official X account is @Quanlet_XYZ. Support channels are not announced.</li>
             </ul>
           </section>
         </div>

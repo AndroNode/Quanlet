@@ -78,7 +78,7 @@ const FAQ: Array<[string, string]> = [
         : 'On testnet, yes: the contracts run on Robinhood Chain testnet and anyone can try them. Mainnet is not live, and no real funds should be sent to any address claiming otherwise.',
   ],
   ['Does connecting my wallet protect it?', 'No. Only assets you move into a Quanlet vault are protected. Connecting a wallet only lets it pay gas and send what you approve.'],
-  ['Do I need a token?', 'No. Vaults, signing, payments and recovery work without any token, and no token has been announced.'],
+  ['Do I need a token?', 'No. Vaults, signing, payments and recovery work without any token. The QUANLET token (contract address at the bottom of every page) gives no power over any vault.'],
   ['What doesn\u2019t Quanlet protect?', 'Only assets inside a vault, and only who may move them. It does not make Robinhood Chain, bridges, token issuers or your devices quantum-resistant. If you lose both spending keys and two guardians, nobody can recover the funds, including the Quanlet team, which holds no keys to your vault.'],
   ['What happens if this website goes down?', 'Your vault keeps working. It is a contract on chain with no owner, and any wallet can submit your signed requests to it directly, without this site.'],
 ];

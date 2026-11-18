@@ -87,12 +87,21 @@ export const ConfigSchema = z.object({
 
 export type QuanletConfig = z.infer<typeof ConfigSchema>;
 
-/** Safe defaults: demo mode, nothing announced, no token. Network values from docs.robinhood.com/chain/connecting (checked 5 Nov 2026). */
+/** Defaults bundled with the site (Cloudflare KV can override them through /api/config). Network values from docs.robinhood.com/chain/connecting (checked 5 Nov 2026). */
 export const DEFAULT_CONFIG: QuanletConfig = {
   releaseMode: 'testnet',
   docsVersion: 'Whitepaper v2.0',
-  social: { x: null },
-  token: { ticker: null, contractAddress: null, network: null, explorerUrl: null, buyUrl: null, chartUrl: null, verified: false },
+  social: { x: 'https://x.com/Quanlet_XYZ' },
+  // QUANLET token on Robinhood Chain mainnet (checked on chain 18 Nov 2026: name and symbol QUANLET, 18 decimals).
+  token: {
+    ticker: 'QUANLET',
+    contractAddress: '0x62cc5a8Ad309c306fC744d901517Fa38993a5235',
+    network: 'Robinhood Chain',
+    explorerUrl: 'https://robinhoodchain.blockscout.com',
+    buyUrl: null,
+    chartUrl: null,
+    verified: true,
+  },
   networks: {
     testnet: {
       name: 'Robinhood Chain Testnet',
