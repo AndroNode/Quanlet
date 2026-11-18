@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import { useRelay } from '../testnet/v2/relay';
 import { PageFacts, PageMark } from '../components/PageMarks';
 import { useUi } from '../store';
 import { DEFAULT_CONFIG } from '@quanlet/config';
@@ -307,6 +308,10 @@ const FAQ: Array<[string, string]> = [
 
 export default function Docs() {
   const cfg = useUi((s) => s.config);
+  const relay = useRelay((s) => s.status);
+  const loadRelay = useRelay((s) => s.load);
+  useEffect(() => void loadRelay(), [loadRelay]);
+  const relayOn = !!relay?.enabled;
   return (
     <div className="wrap page">
       <header className="page-head ph ph-docs">
@@ -351,7 +356,13 @@ export default function Docs() {
           <section id="gaps" aria-labelledby="h-gaps">
             <h2 id="h-gaps">Known gaps</h2>
             <ul>
-              <li>There is no hosted relayer: the vault pages can sign a transfer for a relayer and submit one, but nobody runs a relayer service yet.</li>
+              {relayOn ? (
+                <li>
+                  The Quanlet relayer can send a signed transfer and pay its gas, for a small ETH fee the vault pays in the same transaction. Your keys sign the fee and the relayer’s address, so it can change nothing and holds no power over any vault. FAST pays it only if your payment rules list it.
+                </li>
+              ) : (
+                <li>There is no hosted relayer: the vault pages can sign a transfer for a relayer and submit one, but nobody runs a relayer service yet.</li>
+              )}
               <li>The deployed 2.0 vault contract is 26,712 bytes, larger than Ethereum’s 24,576-byte limit. Robinhood Chain testnet and mainnet both accept contracts up to 98,304 bytes.</li>
               {!(IS_MAINNET && MAINNET_V2) && <li>No mainnet address has been published.</li>}
               {IS_MAINNET && MAINNET_V2 && <li>Mainnet vaults hold ETH only. Supporting tokens needs a new vault factory; existing vaults keep the assets they were created with.</li>}

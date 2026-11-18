@@ -5,6 +5,7 @@
  */
 import { z } from 'zod';
 
+const hex32 = z.string().regex(/^0x[0-9a-fA-F]{64}$/);
 const address = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
 const url = z.string().url().startsWith('https://');
 
@@ -56,6 +57,8 @@ export const ConfigSchema = z.object({
         tokens: z.array(z.object({ symbol: z.string(), name: z.string(), address, decimals: z.number().int() })).default([]),
         /** First block of the deployment: searches for past transactions start here. */
         deployedAtBlock: z.number().int().nonnegative().optional(),
+        /** Runtime code hash of the vaults each factory creates (the relayer only submits to these). */
+        vaultCodehashes: z.array(hex32).default([]),
       })
       .nullable()
       .default(null),
@@ -78,6 +81,8 @@ export const ConfigSchema = z.object({
         vaultCodeStores: z.array(address).default([]),
         /** Day of the deployment block, YYYY-MM-DD (UTC). */
         deployedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        /** Runtime code hash of the vaults the factory creates (the relayer only submits to these). */
+        vaultCodehashes: z.array(hex32).default([]),
       })
       .nullable()
       .default(null),
@@ -137,6 +142,8 @@ export const DEFAULT_CONFIG: QuanletConfig = {
       manifestUrl: 'contracts/deployments/46630.v2.tokens.json',
       deployedAtBlock: 153958071,
       compatibleVaultFactories: ['0xE8A8F2F714f06fdd83630958FD23503872549db3'],
+      // Vaults from the token factory, then from the first (ETH-only) factory.
+      vaultCodehashes: ['0x76bdab13397831f95926f92d61deb1472672884c9bda3c3107182fd83d5b3b0f', '0xeb8f2795062320964d351c186037118652517e4f11f4e057e843e170a9f5b092'],
       tokens: [
         { symbol: 'TSLA', name: 'Tesla (test)', address: '0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E', decimals: 18 },
         { symbol: 'AMZN', name: 'Amazon (test)', address: '0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02', decimals: 18 },
@@ -161,7 +168,10 @@ export const DEFAULT_CONFIG: QuanletConfig = {
         '0xb9CE5e041f3b943E7421EbD523a4019C5B8b660B',
         '0xeac760E26c42181b71EA3cC98a871832A51c8e74'
       ],
-      deployedOn: '2026-11-17'
+      deployedOn: '2026-11-17',
+      vaultCodehashes: [
+        '0x7089098a5e3746cb4cbd152eecd8389543c6f6f09907fc78a56cff6d3704551a'
+      ]
     },
     // mainnetV2:end
   },

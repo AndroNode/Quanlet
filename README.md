@@ -152,6 +152,22 @@ Source is verified through Sourcify. `docs/MAINNET-RUNBOOK.md` records every lau
 any time (read-only). Some mainnet addresses equal testnet ones because the same wallet deployed both at the same
 nonces; the chains are separate.
 
+## Relayer
+
+The Worker can submit signed transfers and pay their gas (`apps/api/src/relay.ts`). A transfer pays the relayer a
+fee in ETH from the vault, in the same transaction; the vault's keys sign that fee and the relayer's address, so the
+relayer can change nothing and has no power over any vault. It only submits to contracts with the code of a real
+Quanlet vault (`vaultCodehashes` in `packages/config`), after simulating the call, and only when the fee covers the gas.
+
+- `GET /api/relay`: on or off, the relayer address and today's fees. `POST /api/relay`: a
+  `quanlet-v2-signed-transfer`. `POST /api/relay/execute`: a matured protected transfer that pays the relayer.
+  `POST /api/relay/sweep`: pays earnings above a 0.005 ETH gas float to `RELAYER_PAYOUT`.
+- Turn it on with the Worker secret `RELAYER_PRIVATE_KEY` (a fresh key used for nothing else; `wrangler secret put`)
+  and the variable `RELAYER_PAYOUT`, then fund the relayer address with a little ETH. Without the key it is off and
+  the vault pages hide it.
+- FAST can pay the relayer only if the vault's payment rules list it ("Add the Quanlet relayer"); protected
+  transfers can pay it any time.
+
 ## Licences
 
 - Smart contracts (`contracts/`): MIT, see `contracts/LICENSE`. This matches the SPDX headers in every contract

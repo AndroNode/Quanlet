@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Address } from 'viem';
 import { TARGET_CHAIN, useWallet } from '../wallet';
-import { ChainError, send } from '../testnet/chain';
+import { ChainError, send, waitReceipt, type Receipt } from '../testnet/chain';
+import type { Hex } from 'viem';
 import { useSessionKeys } from '../testnet/keyfile';
 import { ERRORS, STATE, keyStatus, loadVault, type VaultView } from '../testnet/v2/chain';
 import { NEXT_NAMES, ROLE_NAMES, getSlot, patchSlot, useProfileV2, type ProfileV2, type SlotName } from '../testnet/v2/profile';
@@ -27,6 +28,8 @@ interface VaultApp {
   /** Wallet connected on the right network: transactions can be sent. */
   ready: boolean;
   run: RunFn;
+  /** Like run, but the Quanlet relayer sends the transaction and pays its gas: no wallet needed. */
+  relayRun: RelayRunFn;
   note: Note;
   recheck: () => Promise<void>;
   checking: boolean;
@@ -38,6 +41,8 @@ interface VaultApp {
   step: SetupStep;
   forget: () => void;
 }
+
+export type RelayRunFn = (label: string, step: () => Promise<Hex>, after?: (r: Receipt) => void) => Promise<boolean>;
 
 const Ctx = createContext<VaultApp | null>(null);
 
@@ -71,6 +76,21 @@ export function VaultAppProvider({ children }: { children: ReactNode }) {
       after?.(r);
       setActivity({ kind: 'ok', text: `${label}: done.`, hash: r.transactionHash });
       void useWallet.getState().refreshBalance();
+      return true;
+    } catch (e) {
+      setActivity({ kind: 'err', text: `${label}: ${e instanceof ChainError ? e.message : (e as Error).message}` });
+      return false;
+    }
+  }, []);
+  const relayRun: RelayRunFn = useCallback(async (label, step, after) => {
+    setActivity({ kind: 'busy', text: `${label}: signing and handing it to the relayer…` });
+    try {
+      const hash = await step();
+      setActivity({ kind: 'busy', text: `${label}: sent by the relayer, waiting for the chain…`, hash });
+      const r = await waitReceipt(hash);
+      if (r.status !== '0x1') throw new ChainError('The transaction reverted on chain. Open it on the explorer for details.');
+      after?.(r);
+      setActivity({ kind: 'ok', text: `${label}: done. The relayer paid the gas.`, hash: r.transactionHash });
       return true;
     } catch (e) {
       setActivity({ kind: 'err', text: `${label}: ${e instanceof ChainError ? e.message : (e as Error).message}` });
@@ -187,7 +207,7 @@ export function VaultAppProvider({ children }: { children: ReactNode }) {
   }, [setProfile]);
 
   const value = useMemo<VaultApp>(
-    () => ({ profile, setProfile, view, viewErr, activity, setActivity, busy, ready, run, note, recheck, checking, refresh, now, allReady, allTested, step, forget }),
+    () => ({ profile, setProfile, view, viewErr, activity, setActivity, busy, ready, run, relayRun, note, recheck, checking, refresh, now, allReady, allTested, step, forget }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [profile, view, viewErr, activity, busy, ready, checking, now, allReady, allTested, step],
   );

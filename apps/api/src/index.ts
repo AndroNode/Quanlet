@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { DEFAULT_CONFIG, parseConfig } from '@quanlet/config';
+import { Relayer, RelayError, limited } from './relay';
 
 export interface Env {
   ASSETS: Fetcher;
@@ -13,6 +14,10 @@ export interface Env {
   MAINNET_RPC_URL?: string;
   /** Set on preview deployments: search engines are asked not to index them. */
   PREVIEW?: string;
+  /** The relayer's own key (a Worker secret). It only pays gas; without it the relayer is off. */
+  RELAYER_PRIVATE_KEY?: string;
+  /** Where the relayer pays its earnings above its gas float (a plain variable; see relay.ts sweep). */
+  RELAYER_PAYOUT?: string;
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -61,6 +66,14 @@ export const RPC_METHODS = new Set([
   'alchemy_getTokenMetadata',
 ]);
 const ALCHEMY_TESTNET = 'https://robinhood-testnet.g.alchemy.com/v2/';
+
+/** The RPC this Worker reads and sends through: the override, then Alchemy (testnet), then the public endpoint. */
+function upstreamOf(e: Env): string {
+  const main = isMainnet(e);
+  const key = main ? undefined : e.ALCHEMY_API_KEY?.trim();
+  const override = (main ? e.MAINNET_RPC_URL : e.TESTNET_RPC_URL)?.trim();
+  return override || (key ? ALCHEMY_TESTNET + encodeURIComponent(key) : DEFAULT_CONFIG.networks[main ? 'mainnet' : 'testnet'].rpcUrl);
+}
 const RPC_ERR = (id: unknown, code: number, message: string) => ({ jsonrpc: '2.0', id: id ?? null, error: { code, message } });
 
 app.post('/api/rpc', async (c) => {
@@ -79,7 +92,7 @@ app.post('/api/rpc', async (c) => {
   const main = isMainnet(c.env);
   const key = main ? undefined : c.env.ALCHEMY_API_KEY?.trim();
   const override = (main ? c.env.MAINNET_RPC_URL : c.env.TESTNET_RPC_URL)?.trim();
-  const upstream = override || (key ? ALCHEMY_TESTNET + encodeURIComponent(key) : DEFAULT_CONFIG.networks[main ? 'mainnet' : 'testnet'].rpcUrl);
+  const upstream = upstreamOf(c.env);
   try {
     const res = await fetch(upstream, {
       method: 'POST',
@@ -105,6 +118,81 @@ app.get('/api/config', async (c) => {
     /* keep defaults */
   }
   return c.json(cfg, 200, { 'Cache-Control': 'public, max-age=60' });
+});
+
+// ------------------------------------------------------------------ relayer (src/relay.ts)
+
+let relayer: { key: string; mode: string; rpc: string; r: Relayer } | null = null;
+function relayerOf(e: Env): Relayer | null {
+  const key = e.RELAYER_PRIVATE_KEY?.trim();
+  if (!key) return null;
+  const rpc = upstreamOf(e);
+  if (relayer && relayer.key === key && relayer.mode === e.RELEASE_MODE && relayer.rpc === rpc) return relayer.r;
+  const main = isMainnet(e);
+  const net = DEFAULT_CONFIG.networks[main ? 'mainnet' : 'testnet'];
+  const dep = main ? DEFAULT_CONFIG.deployments.mainnetV2 : DEFAULT_CONFIG.deployments.testnetV2;
+  const r = new Relayer({ chainId: net.chainId, name: net.name, rpcUrl: rpc, vaultCodehashes: dep?.vaultCodehashes ?? [] }, key);
+  relayer = { key, mode: e.RELEASE_MODE, rpc, r };
+  return r;
+}
+
+const relayFail = (c: { json: (b: unknown, s: number) => Response }, e: unknown) =>
+  e instanceof RelayError ? c.json({ error: e.message, ...e.extra }, e.status) : c.json({ error: 'The relayer is unavailable. Send the transfer from your own wallet.' }, 502);
+
+app.get('/api/relay', async (c) => {
+  const r = relayerOf(c.env);
+  if (!r) return c.json({ enabled: false }, 200, { 'Cache-Control': 'no-store' });
+  try {
+    return c.json(await r.status(), 200, { 'Cache-Control': 'no-store' });
+  } catch (e) {
+    return relayFail(c, e);
+  }
+});
+
+async function relayBody(c: { req: { text: () => Promise<string>; header: (n: string) => string | undefined } }) {
+  const ip = c.req.header('cf-connecting-ip') ?? 'local';
+  if (limited(ip)) throw new RelayError(429, 'Too many requests. Wait a minute and try again.');
+  const text = await c.req.text();
+  if (text.length > 65536) throw new RelayError(413, 'Request too large.');
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    throw new RelayError(400, 'Send JSON.');
+  }
+}
+
+app.post('/api/relay', async (c) => {
+  const r = relayerOf(c.env);
+  if (!r) return c.json({ error: 'The relayer is off on this site.' }, 503);
+  try {
+    const body = await relayBody(c);
+    const vault = (body as { vault?: string })?.vault;
+    if (typeof vault === 'string' && limited(`vault:${vault.toLowerCase()}`, 6, 600_000)) throw new RelayError(429, 'Too many relayed transfers for this vault. Wait a few minutes.');
+    return c.json(await r.submit(body), 200);
+  } catch (e) {
+    return relayFail(c, e);
+  }
+});
+
+app.post('/api/relay/execute', async (c) => {
+  const r = relayerOf(c.env);
+  if (!r) return c.json({ error: 'The relayer is off on this site.' }, 503);
+  try {
+    return c.json(await r.execute(await relayBody(c)), 200);
+  } catch (e) {
+    return relayFail(c, e);
+  }
+});
+
+app.post('/api/relay/sweep', async (c) => {
+  const r = relayerOf(c.env);
+  if (!r) return c.json({ error: 'The relayer is off on this site.' }, 503);
+  try {
+    if (limited('sweep', 2, 600_000)) throw new RelayError(429, 'Paid out recently. Try again in a few minutes.');
+    return c.json(await r.sweep(c.env.RELAYER_PAYOUT?.trim()), 200);
+  } catch (e) {
+    return relayFail(c, e);
+  }
 });
 
 app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404));

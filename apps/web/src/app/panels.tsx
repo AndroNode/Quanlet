@@ -85,6 +85,8 @@ import {
 import { Ext, WalletCard, eq, left, link, when, type Activity } from '../pages/Testnet';
 import { IS_MAINNET, WORDS } from '../net';
 import { RiskNotice, riskAccepted } from './RiskNotice';
+import { useVaultApp } from './context';
+import { relayAddress, relayExecute, relaySubmit, useRelay } from '../testnet/v2/relay';
 
 export const DELAY_TEXT: Record<number, string> = { 0: 'No delay', 3600: '1 hour', 86400: '24 hours', 259200: '72 hours' };
 export const STATE_TEXT: Record<number, string> = {
@@ -538,6 +540,13 @@ export function KeyRow({ profile, n, busy, ready, run, recheck, note }: { profil
 // -------------------------------------------------------------------- policy form
 
 export function PolicyFields({ d, set, me, idp, assets, topUp }: { d: PolicyDraft; set: (d: PolicyDraft) => void; me?: string | null; idp: string; assets: Asset[]; topUp?: boolean }) {
+  const relay = useRelay((s) => s.status);
+  const loadRelay = useRelay((s) => s.load);
+  useEffect(() => void loadRelay(), [loadRelay]);
+  const relayer = relayAddress(relay);
+  const relayListed = !!relayer && d.feeRecipients.some((r) => eq(r, relayer));
+  // The FAST fee cap the relayer button sets: four times today's FAST fee, so a gas spike does not lock FAST out.
+  const relayCap = relay?.enabled ? formatEther(relay.fees.fast * 4n) : '';
   const setRule = (a: Asset, k: keyof RuleDraft, v: string) => {
     const key = a.address.toLowerCase();
     set({ ...d, rules: { ...d.rules, [key]: { ceiling: '', cap: '', ...d.rules[key], [k]: v } } });
@@ -597,6 +606,32 @@ export function PolicyFields({ d, set, me, idp, assets, topUp }: { d: PolicyDraf
             <textarea id={`${idp}-rec`} className="mono" rows={3} placeholder={me ?? '0x…'} value={d.recipients.join('\n')} onChange={(e) => set({ ...d, recipients: list(e.target.value) })} />
             <p className="small muted">{me ? 'Empty means your connected wallet only.' : 'Connect a wallet or add at least one address.'}</p>
           </div>
+          {relayer && (
+            <div className="notice">
+              <span>
+                <strong>{relayListed ? 'FAST can pay the Quanlet relayer' : 'Let FAST use the Quanlet relayer'}</strong>
+                {relayListed
+                  ? ' The relayer can send FAST payments without your wallet, for its fee in ETH from the allowance.'
+                  : ' Then FAST payments can be sent without a wallet: the relayer pays the gas and takes a small ETH fee from the allowance.'}
+              </span>
+              {!relayListed && (
+                <button
+                  type="button"
+                  className="btn sm"
+                  style={{ marginTop: 8 }}
+                  onClick={() =>
+                    set({
+                      ...d,
+                      feeRecipients: [...d.feeRecipients, relayer],
+                      maxFee: ethOk(d.maxFee) && units(d.maxFee) >= units(relayCap) ? d.maxFee : relayCap,
+                    })
+                  }
+                >
+                  Add the Quanlet relayer
+                </button>
+              )}
+            </div>
+          )}
           <details className="tn-more" open={!!(d.maxFee || d.feeRecipients.length)}>
             <summary>Relayer fees (optional)</summary>
             <p className="small muted">
@@ -874,11 +909,26 @@ export function SendForm({
   const [fee, setFee] = useState('');
   const [review, setReview] = useState<Transfer | null>(null);
   const [relayed, setRelayed] = useState<string | null>(null);
+  const { relayRun } = useVaultApp();
+  const relay = useRelay((s) => s.status);
+  const loadRelay = useRelay((s) => s.load);
+  useEffect(() => void loadRelay(), [loadRelay]);
+  const relayer = relayAddress(relay);
+  // Who pays the gas: the connected wallet, or the Quanlet relayer for a fee from the vault.
+  const [gasBy, setGasBy] = useState<'wallet' | 'relayer'>('wallet');
+  useEffect(() => {
+    if (relayer && !ready) setGasBy('relayer');
+    if (!relayer) setGasBy('wallet');
+  }, [relayer, ready]);
+  const viaRelay = gasBy === 'relayer' && !!relayer && relay?.enabled === true;
   const A_ = assetOf(asset);
   const recipient = (to.trim() || me || '') as string;
   const amount = unitsOk(amt, A_.decimals) ? units(amt, A_.decimals) : 0n;
-  const feeOn = feeTo.trim() !== '' || fee.trim() !== '';
-  const feeWei = feeOn && ethOk(fee) ? units(fee) : 0n;
+  const delay = view?.policy.protectedDelay ?? 0;
+  const relayFee = viaRelay && relay?.enabled ? (route === ROUTE.FAST ? relay.fees.fast : delay ? relay.fees.protectedDelayed : relay.fees.protected) : 0n;
+  const feeOn = !viaRelay && (feeTo.trim() !== '' || fee.trim() !== '');
+  const feeTo_ = viaRelay ? relayer! : feeTo.trim();
+  const feeWei = viaRelay ? relayFee : feeOn && ethOk(fee) ? units(fee) : 0n;
   const feeProblem = feeOn ? (!isAddress(feeTo.trim()) ? 'Enter the relayer’s address.' : !ethOk(fee) ? 'Enter the relayer fee in ETH.' : null) : null;
   const av = view?.assets.find((x) => eq(x.asset, asset));
   const ethV = view?.assets.find((x) => x.asset === ETH);
@@ -902,19 +952,22 @@ export function SendForm({
                   : isAddress(recipient) && !rule.recipients.some((r) => eq(r, recipient))
                     ? 'That recipient is not on the FAST list.'
                     : feeWei > 0n && feeWei > view.policy.maxFastFeeWei
-                      ? `The fee is above the FAST maximum (${formatEther(view.policy.maxFastFeeWei)} ETH).`
-                      : feeWei > 0n && !view.policy.fastFeeRecipients.some((r) => eq(r, feeTo.trim()))
-                        ? 'That relayer is not one FAST may pay.'
+                      ? `The ${viaRelay ? 'relayer ' : ''}fee (${formatEther(feeWei)} ETH) is above this vault’s FAST maximum (${formatEther(view.policy.maxFastFeeWei)} ETH).`
+                      : feeWei > 0n && !view.policy.fastFeeRecipients.some((r) => eq(r, feeTo_))
+                        ? viaRelay
+                          ? 'FAST cannot pay the Quanlet relayer yet: add it under Payment rules, or use the protected route or your wallet.'
+                          : 'That relayer is not one FAST may pay.'
                         : feeWei > 0n && asset !== ETH && (!liveRule(now, ethRule) || feeWei > (ethV?.remaining ?? 0n))
                           ? 'The fee needs ETH FAST allowance, which is missing or used up.'
                           : null;
   useEffect(() => {
     if (view && !view.policy.fastEnabled) setRoute(ROUTE.PROTECTED);
   }, [view]);
-  const delay = view?.policy.protectedDelay ?? 0;
   const canSend = (route === ROUTE.FAST ? !!P && !fastWhy : !!P && !!A) && !feeProblem;
-  const blocker = !ready
-    ? 'Connect your wallet to pay the gas.'
+  const blocker = !ready && !viaRelay
+    ? relayer
+      ? 'Connect your wallet to pay the gas, or let the Quanlet relayer pay it.'
+      : 'Connect your wallet to pay the gas.'
     : pending
       ? 'Outflows are frozen while a change is pending.'
       : !P
@@ -953,10 +1006,18 @@ export function SendForm({
               ? 'When the transaction is accepted'
               : `Executable after about ${when((view?.now || Math.floor(Date.now() / 1000)) + delay)}, then 7 days to execute`}
           </dd>
+          <dt>Gas</dt>
+          <dd>{viaRelay ? 'Paid by the Quanlet relayer' : 'Paid by your connected wallet'}</dd>
           <dt>Relayer fee</dt>
-          <dd>{review.feeWei ? `${formatEther(review.feeWei)} ETH to ${review.feeRecipient}` : 'None'}</dd>
+          <dd>
+            {review.feeWei
+              ? `${formatEther(review.feeWei)} ETH from the vault to ${relayer && eq(review.feeRecipient, relayer) ? 'the Quanlet relayer' : review.feeRecipient}`
+              : 'None'}
+          </dd>
         </dl>
-        {view && review.amount > (view.assets.find((x) => eq(x.asset, review.asset))?.balance ?? 0n) && <p className="small tn-err">This is more than the vault holds now.</p>}
+        {view && review.amount + (review.asset === ETH ? review.feeWei : 0n) > (view.assets.find((x) => eq(x.asset, review.asset))?.balance ?? 0n) && (
+          <p className="small tn-err">This is more than the vault holds now{review.feeWei ? ', fee included' : ''}.</p>
+        )}
         {me && !eq(review.recipient, me) && <p className="small muted">The recipient is not your connected wallet. Check the address character by character.</p>}
         {relayed ? (
           <div className="tn-inline stack">
@@ -973,6 +1034,40 @@ export function SendForm({
                 Done
               </button>
             </div>
+          </div>
+        ) : viaRelay ? (
+          <div className="row">
+            <button
+              className="btn primary"
+              disabled={busy || pending || !P || (review.route === ROUTE.PROTECTED && !A)}
+              onClick={() => {
+                const rv = review;
+                let id: Hex | null = null;
+                void relayRun(
+                  rv.route === ROUTE.FAST ? 'FAST transfer' : 'Protected transfer',
+                  async () => {
+                    const s = await signTransfer(vault, rv, P!, rv.route === ROUTE.PROTECTED ? A : null);
+                    id = s.id;
+                    return (await relaySubmit(s)).hash;
+                  },
+                  (rc) => {
+                    const evs = eventsOf(rc, VAULT_ABI);
+                    const queued = evs.find((x) => x.eventName === 'WithdrawalScheduled');
+                    const done = evs.find((x) => x.eventName === 'TransferExecuted');
+                    const tid = ((queued?.args.id ?? done?.args.id) as Hex | undefined) ?? id!;
+                    if (queued) update((p) => ({ ...p, withdrawals: p.withdrawals.includes(tid) ? p.withdrawals : [...p.withdrawals, tid] }));
+                    record(rv, tid, { hash: rc.transactionHash, queued: !!queued, relayed: true });
+                    setAmt('');
+                    setReview(null);
+                  },
+                ).then(refresh);
+              }}
+            >
+              {review.route === ROUTE.FAST ? 'Sign with primary and send' : 'Sign with both keys and send'}
+            </button>
+            <button className="btn ghost" disabled={busy} onClick={() => setReview(null)}>
+              Edit
+            </button>
           </div>
         ) : (
           <div className="row">
@@ -1036,7 +1131,7 @@ export function SendForm({
         e.preventDefault();
         if (!amount || !isAddress(recipient) || !canSend) return;
         setRelayed(null);
-        setReview({ route, asset, recipient: recipient as Address, amount, feeRecipient: feeWei ? (feeTo.trim() as Address) : ETH, feeWei });
+        setReview({ route, asset, recipient: recipient as Address, amount, feeRecipient: feeWei ? (feeTo_ as Address) : ETH, feeWei });
       }}
     >
       <h3>Send a payment</h3>
@@ -1076,6 +1171,24 @@ export function SendForm({
         <input id="t2-to" className="mono" placeholder={me ?? '0x…'} value={to} onChange={(e) => setTo(e.target.value)} aria-invalid={to !== '' && !isAddress(to.trim())} />
         <p className="small muted">{me ? 'Leave empty to send to your connected wallet.' : 'The address that receives the funds.'}</p>
       </div>
+      {relayer && relay?.enabled && (
+        <div className="field">
+          <span className="small muted">Gas</span>
+          <div className="routes gas-opts" role="radiogroup" aria-label="Who pays the gas">
+            <button type="button" role="radio" aria-checked={gasBy === 'relayer'} className={`route-opt${gasBy === 'relayer' ? ' on' : ''}`} onClick={() => setGasBy('relayer')}>
+              <b>Quanlet relayer</b>
+              <span>
+                No wallet needed. Fee {formatEther(route === ROUTE.FAST ? relay.fees.fast : delay ? relay.fees.protectedDelayed : relay.fees.protected)} ETH, paid from the vault.
+              </span>
+            </button>
+            <button type="button" role="radio" aria-checked={gasBy === 'wallet'} className={`route-opt${gasBy === 'wallet' ? ' on' : ''}`} onClick={() => setGasBy('wallet')}>
+              <b>My wallet</b>
+              <span>{ready ? 'Your connected wallet pays the gas.' : 'Connect a wallet to pay the gas yourself.'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+      {!viaRelay && (
       <details className="tn-more" open={feeOn}>
         <summary>Pay a relayer fee (optional)</summary>
         <p className="small muted">The fee is paid in ETH from the vault to the relayer you name, in the same transaction.</p>
@@ -1090,10 +1203,11 @@ export function SendForm({
           </div>
         </div>
       </details>
+      )}
       {feeProblem && <p className="small tn-err">{feeProblem}</p>}
       {route === ROUTE.FAST && fastWhy && <p className="small tn-err">{fastWhy}</p>}
       {blocker && <p className="small muted">{blocker}</p>}
-      <button className="btn primary" disabled={!ready || busy || pending || !amount || !isAddress(recipient) || !canSend}>
+      <button className="btn primary" disabled={(!ready && !viaRelay) || busy || pending || !amount || !isAddress(recipient) || !canSend}>
         Review transfer
       </button>
     </form>
@@ -1103,6 +1217,11 @@ export function SendForm({
 /** Protected transfers waiting for their delay: execute, cancel or clear them. */
 export function QueueTable({ profile, view, now, busy, ready, run, refresh }: { profile: ProfileV2; view: VaultView | null; now: number; busy: boolean; ready: boolean; run: RunFn; refresh: () => Promise<void> }) {
   const { P, A, pending } = useSigners(profile, view);
+  const { relayRun } = useVaultApp();
+  const relay = useRelay((s) => s.status);
+  const loadRelay = useRelay((s) => s.load);
+  useEffect(() => void loadRelay(), [loadRelay]);
+  const relayer = relayAddress(relay);
   const vault = profile.vault!;
   const delay = view?.policy.protectedDelay ?? 0;
   const rows = useMemo(() => (view ? [...view.withdrawals].reverse() : []), [view]);
@@ -1155,10 +1274,22 @@ export function QueueTable({ profile, view, now, busy, ready, run, refresh }: { 
                     </td>
                     <td>{label}</td>
                     <td className="tn-actions">
-                      {mature && !expired && (
-                        <button className="btn primary sm" disabled={!ready || busy || pending} onClick={() => void run('Execute transfer', async () => executeTx(vault, x.id)).then(refresh)}>
+                      {mature && !expired && relayer && x.feeWei > 0n && eq(x.feeRecipient, relayer) ? (
+                        <button
+                          className="btn primary sm"
+                          title="The Quanlet relayer executes it and pays the gas; this transfer already pays its fee."
+                          disabled={busy || pending}
+                          onClick={() => void relayRun('Execute transfer', async () => (await relayExecute(vault, x.id)).hash).then(refresh)}
+                        >
                           Execute
                         </button>
+                      ) : (
+                        mature &&
+                        !expired && (
+                          <button className="btn primary sm" disabled={!ready || busy || pending} onClick={() => void run('Execute transfer', async () => executeTx(vault, x.id)).then(refresh)}>
+                            Execute
+                          </button>
+                        )
                       )}
                       {x.status === 1 && (expired || !current) && (
                         <button

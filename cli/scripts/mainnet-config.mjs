@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createPublicClient, getAddress, http } from 'viem';
+import { createPublicClient, getAddress, http, keccak256 } from 'viem';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
@@ -32,6 +32,17 @@ if ((await pc.getChainId()) !== 4663) throw new Error('QUANLET_RPC is not Robinh
 const block = await pc.getBlock({ blockNumber: BigInt(m.deployedAtBlock) });
 const deployedOn = new Date(Number(block.timestamp) * 1000).toISOString().slice(0, 10);
 
+// Every vault from this factory has the same runtime code (its immutables are the factory's): read it from the smoke vault.
+const gatePath = manifestPath.replace(/\.v2\.json$/, '.v2.gate-b.json');
+let vaultCodehashes = [];
+try {
+  const gate = JSON.parse(readFileSync(gatePath, 'utf8'));
+  const code = await pc.getCode({ address: gate.vault });
+  if (code && code !== '0x') vaultCodehashes = [keccak256(code)];
+} catch {
+  console.warn('No smoke-test vault found: vaultCodehashes left empty (the relayer stays off until it is set).');
+}
+
 const rel = relative(root, manifestPath).split('\\').join('/');
 const entry = {
   keyFactory: getAddress(m.keyFactoryV2),
@@ -45,6 +56,7 @@ const entry = {
   f1600Helper: getAddress(m.f1600Helper),
   vaultCodeStores: m.vaultCodeStores.map((a) => getAddress(a)),
   deployedOn,
+  vaultCodehashes,
 };
 
 const src = readFileSync(configPath, 'utf8');

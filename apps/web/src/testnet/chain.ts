@@ -282,7 +282,7 @@ async function preflight(from: Address, tx: Tx, book?: ErrorBook) {
   }
 }
 
-async function waitReceipt(hash: Hex, timeoutMs = 180_000): Promise<Receipt> {
+export async function waitReceipt(hash: Hex, timeoutMs = 180_000): Promise<Receipt> {
   const end = Date.now() + timeoutMs;
   while (Date.now() < end) {
     const r = await rpc<Receipt | null>('eth_getTransactionReceipt', [hash]).catch(() => null);
